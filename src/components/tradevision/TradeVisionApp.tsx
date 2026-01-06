@@ -7,6 +7,7 @@ import ChartWidget from './ChartWidget';
 import ResearchSection from './ResearchSection';
 import MyResearchesView from './MyResearchesView';
 import { useAuth } from '@/contexts/AuthContext';
+import StockSearch from './StockSearch';
 
 const TradeVisionApp: React.FC = () => {
     const { user, loading, signOut } = useAuth();
@@ -71,14 +72,10 @@ const TradeVisionApp: React.FC = () => {
                     <div className="h-6 w-[1px] bg-[#e0e3eb] dark:bg-[#2a2e39]" />
 
                     {/* Main Search */}
-                    <div className="relative hidden md:block w-96">
-                        <Icons.Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#787b86]" />
-                        <input
-                            type="text"
-                            placeholder="Search markets, news, or symbols..."
-                            className="w-full bg-[#f0f3fa] dark:bg-[#1e222d] border border-transparent focus:bg-white dark:focus:bg-[#2a2e39] focus:border-[#2962ff] rounded-md pl-10 pr-4 py-1.5 text-sm transition-all outline-none text-[#131722] dark:text-[#d1d4dc] placeholder-[#787b86]"
-                        />
-                    </div>
+                    <StockSearch 
+                        className="hidden md:block w-96"
+                        onSelect={(stock) => console.log('Selected:', stock)}
+                    />
                 </div>
 
                 <div className="flex items-center gap-3">

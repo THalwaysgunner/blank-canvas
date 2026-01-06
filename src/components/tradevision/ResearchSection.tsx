@@ -2,20 +2,21 @@ import React, { useState, useEffect } from 'react';
 import { Icons } from './Icons';
 import { analyzeMarketTrend, analyzeStockDeepDive } from '@/services/geminiService';
 import { AIAnalysisResult } from '@/types';
-import { MOCK_STOCKS } from '@/constants';
+import StockSearch from './StockSearch';
+
+interface Stock {
+    id: number;
+    symbol: string;
+    company_name: string;
+}
 
 const ResearchSection: React.FC = () => {
     const [query, setQuery] = useState('');
     const [generalAnalysis, setGeneralAnalysis] = useState<string>('');
     const [isLoading, setIsLoading] = useState(false);
-    const [selectedStock, setSelectedStock] = useState<string>('AAPL');
+    const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
     const [stockAnalysis, setStockAnalysis] = useState<AIAnalysisResult | null>(null);
     const [isStockLoading, setIsStockLoading] = useState(false);
-
-    useEffect(() => {
-        handleAnalyzeStock(selectedStock);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
     const handleGeneralSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -26,10 +27,10 @@ const ResearchSection: React.FC = () => {
         setIsLoading(false);
     };
 
-    const handleAnalyzeStock = async (symbol: string) => {
+    const handleAnalyzeStock = async (stock: Stock) => {
+        setSelectedStock(stock);
         setIsStockLoading(true);
-        setSelectedStock(symbol);
-        const result = await analyzeStockDeepDive(symbol);
+        const result = await analyzeStockDeepDive(stock.symbol);
         setStockAnalysis(result);
         setIsStockLoading(false);
     };
@@ -37,23 +38,20 @@ const ResearchSection: React.FC = () => {
     return (
         <div className="flex flex-col h-full w-full bg-[#f8f9fd] dark:bg-[#131722] overflow-hidden">
 
-            {/* Top Bar / Ticker Selector */}
-            <div className="flex-none h-[50px] border-b border-[#e0e3eb] dark:border-[#2a2e39] bg-white dark:bg-[#131722] flex items-center px-4 overflow-x-auto">
-                <span className="text-xs font-bold text-[#787b86] uppercase mr-4 tracking-wider">Research Targets:</span>
-                <div className="flex gap-2">
-                    {MOCK_STOCKS.map(stock => (
-                        <button
-                            key={stock.symbol}
-                            onClick={() => handleAnalyzeStock(stock.symbol)}
-                            className={`px-3 py-1 text-xs font-semibold border rounded-sm transition-all whitespace-nowrap ${selectedStock === stock.symbol
-                                    ? 'bg-[#2962ff] border-[#2962ff] text-white'
-                                    : 'bg-transparent border-[#e0e3eb] dark:border-[#2a2e39] text-[#131722] dark:text-[#d1d4dc] hover:bg-[#e0e3eb] dark:hover:bg-[#2a2e39]'
-                                }`}
-                        >
-                            {stock.symbol}
-                        </button>
-                    ))}
-                </div>
+            {/* Top Bar / Stock Search */}
+            <div className="flex-none h-[60px] border-b border-[#e0e3eb] dark:border-[#2a2e39] bg-white dark:bg-[#131722] flex items-center px-4 gap-4">
+                <span className="text-xs font-bold text-[#787b86] uppercase tracking-wider shrink-0">Research Target:</span>
+                <StockSearch 
+                    className="flex-1 max-w-md"
+                    placeholder="Search for a stock to analyze..."
+                    onSelect={handleAnalyzeStock}
+                />
+                {selectedStock && (
+                    <div className="flex items-center gap-2 px-3 py-1.5 bg-[#2962ff]/10 border border-[#2962ff]/30 rounded-md">
+                        <span className="text-sm font-bold text-[#2962ff]">{selectedStock.symbol}</span>
+                        <span className="text-xs text-[#787b86]">{selectedStock.company_name}</span>
+                    </div>
+                )}
             </div>
 
             <div className="flex-1 overflow-hidden flex flex-col lg:flex-row">
@@ -64,13 +62,13 @@ const ResearchSection: React.FC = () => {
                         {isStockLoading ? (
                             <div className="h-full flex flex-col items-center justify-center text-[#787b86] gap-3 py-20">
                                 <div className="w-6 h-6 border-2 border-[#2962ff] border-t-transparent rounded-full animate-spin" />
-                                <span className="text-xs uppercase tracking-wide">Analysing {selectedStock}...</span>
+                                <span className="text-xs uppercase tracking-wide">Analysing {selectedStock?.symbol}...</span>
                             </div>
-                        ) : stockAnalysis ? (
+                        ) : stockAnalysis && selectedStock ? (
                             <div className="animate-in fade-in duration-300">
                                 <div className="flex items-center justify-between mb-6">
                                     <div>
-                                        <h2 className="text-2xl font-bold text-[#131722] dark:text-[#d1d4dc] mb-1">{selectedStock} Analysis</h2>
+                                        <h2 className="text-2xl font-bold text-[#131722] dark:text-[#d1d4dc] mb-1">{selectedStock.symbol} Analysis</h2>
                                         <div className="text-sm text-[#787b86]">Gemini-Pro 1.5 Generated Report</div>
                                     </div>
                                     <div className={`px-4 py-2 text-sm font-bold rounded-sm border ${stockAnalysis.rating.includes('Buy') ? 'border-[#00bfa5] text-[#00bfa5] bg-[#00bfa5]/10' :

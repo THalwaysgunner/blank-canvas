@@ -1,5 +1,7 @@
+import TradeVisionApp from "@/components/tradevision/TradeVisionApp";
+
 const Index = () => {
-  return <div className="min-h-screen bg-background" />;
+  return <TradeVisionApp />;
 };
 
 export default Index;

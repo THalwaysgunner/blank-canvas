@@ -24,7 +24,9 @@ import {
     Trash2,
     MousePointer2,
     List,
-    MessageSquare
+    MessageSquare,
+    FileText,
+    FolderSearch
 } from 'lucide-react';
 
 export const Icons = {
@@ -53,5 +55,7 @@ export const Icons = {
     Trash: Trash2,
     Cursor: MousePointer2,
     List,
-    Message: MessageSquare
+    Message: MessageSquare,
+    FileText,
+    FolderSearch
 };

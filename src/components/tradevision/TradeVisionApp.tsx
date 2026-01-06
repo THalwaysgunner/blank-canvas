@@ -4,6 +4,7 @@ import { Icons } from './Icons';
 import { MOCK_STOCKS, MOCK_NEWS, MOCK_INDICES, MOCK_CALENDAR, generateChartData } from '@/constants';
 import ChartWidget from './ChartWidget';
 import ResearchSection from './ResearchSection';
+import MyResearchesView from './MyResearchesView';
 
 const TradeVisionApp: React.FC = () => {
     const [theme, setTheme] = useState<Theme>(Theme.LIGHT);
@@ -86,6 +87,7 @@ const TradeVisionApp: React.FC = () => {
                     <ToolbarButton icon={Icons.Dashboard} active={activeView === 'home'} onClick={() => setActiveView('home')} tooltip="Home" />
                     <ToolbarButton icon={Icons.Markets} active={activeView === 'markets'} onClick={() => setActiveView('markets')} tooltip="Markets" />
                     <ToolbarButton icon={Icons.AI} active={activeView === 'research'} onClick={() => setActiveView('research')} tooltip="Research & AI" />
+                    <ToolbarButton icon={Icons.FolderSearch} active={activeView === 'my-researches'} onClick={() => setActiveView('my-researches')} tooltip="My Researches" />
                     <div className="w-8 h-[1px] bg-[#e0e3eb] dark:bg-[#2a2e39] my-2" />
                     <ToolbarButton icon={Icons.List} active={rightPanelOpen} onClick={() => setRightPanelOpen(!rightPanelOpen)} tooltip="Watchlist" />
 
@@ -100,6 +102,7 @@ const TradeVisionApp: React.FC = () => {
                     {activeView === 'research' && <ResearchSection />}
                     {activeView === 'markets' && <FullChartMode />}
                     {activeView === 'dashboard' && <MarketOverviewMode />}
+                    {activeView === 'my-researches' && <MyResearchesView />}
                 </main>
 
                 {/* RIGHT SIDEBAR (Watchlist) - Toggleable */}

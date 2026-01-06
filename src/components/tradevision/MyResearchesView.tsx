@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Icons } from './Icons';
-import { MOCK_STOCKS } from '@/constants';
+import { MOCK_STOCKS, generateChartData } from '@/constants';
+import ChartWidget from './ChartWidget';
 
 type TabKey = 'summary' | 'managements' | 'financial' | 'evaluation' | 'insights' | 'financial-variables' | 'forum';
 
@@ -308,13 +309,93 @@ const MyResearchesView: React.FC = () => {
     }
 
     switch (activeTab) {
-      case 'summary':
+      case 'summary': {
+        const stock = selectedStockData ?? MOCK_STOCKS[0];
+        const isPositive = stock.change >= 0;
+        const quickCompare = MOCK_STOCKS.filter((s) => s.symbol !== stock.symbol).slice(0, 3);
+
         return (
           <div className="space-y-6">
-            {/* Stock Metrics Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              {/* Key Metrics */}
-              <div className="bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] p-4 rounded-sm">
+            {/* Header (matches reference layout) */}
+            <div className="flex items-start justify-between gap-4">
+              <div className="min-w-0">
+                <div className="text-[10px] font-bold uppercase tracking-wider text-[#787b86] mb-1">
+                  NASDAQ STOCK MARKET · NLS REAL TIME PRICE · CURRENCY IN USD
+                </div>
+                <h2 className="text-xl sm:text-2xl font-bold text-[#131722] dark:text-[#e0e3eb] truncate">
+                  {stock.name} ({stock.symbol})
+                </h2>
+              </div>
+              <button className="shrink-0 flex items-center gap-2 bg-[#2962ff] text-white text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#1e53e5] transition-colors">
+                <Icons.Plus className="w-4 h-4" />
+                Watchlist
+              </button>
+            </div>
+
+            <div className="flex items-end gap-4 flex-wrap">
+              <div className="text-4xl font-bold text-[#131722] dark:text-[#e0e3eb]">{stock.price.toFixed(2)}</div>
+              <div className={`text-sm font-bold ${isPositive ? 'text-[#00bfa5]' : 'text-[#f23645]'}`}>
+                {isPositive ? '+' : ''}{stock.change.toFixed(2)} ({isPositive ? '+' : ''}{stock.changePercent}%)
+              </div>
+              <div className="text-[10px] text-[#787b86] uppercase tracking-wider pb-1">At close</div>
+            </div>
+
+            {/* Main layout (chart + metrics + analyst cards) */}
+            <div className="grid grid-cols-12 gap-4">
+              {/* Chart */}
+              <div className="col-span-12 xl:col-span-7 bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] rounded-sm overflow-hidden">
+                <div className="p-3 border-b border-[#e0e3eb] dark:border-[#2a2e39] flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1 flex-wrap">
+                    {['1D', '5D', '1M', '3M', 'YTD', '1Y', '5Y', 'Max'].map((t) => (
+                      <button
+                        key={t}
+                        className={`px-2 py-1 text-xs font-medium rounded-sm transition-colors ${t === '3M'
+                          ? 'bg-[#2962ff] text-white'
+                          : 'text-[#787b86] hover:bg-[#f0f3fa] dark:hover:bg-[#2a2e39]'
+                          }`}
+                      >
+                        {t}
+                      </button>
+                    ))}
+                    <div className="mx-1 h-4 w-px bg-[#e0e3eb] dark:bg-[#2a2e39]" />
+                    <button className="px-2 py-1 text-xs font-medium rounded-sm bg-[#2962ff]/10 text-[#2962ff]">
+                      Projection
+                    </button>
+                  </div>
+
+                  <button className="p-1 text-[#787b86] hover:text-[#2962ff] hover:bg-[#2962ff]/10 rounded-sm transition-colors" title="Expand">
+                    <Icons.Maximize className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="p-3">
+                  <div className="h-[260px]">
+                    <ChartWidget data={chartData} />
+                  </div>
+
+                  {/* Quick Compare (bottom of chart like reference) */}
+                  <div className="mt-3">
+                    <div className="text-[10px] font-bold text-[#787b86] uppercase tracking-wider mb-2">Quick Compare</div>
+                    <div className="flex flex-wrap gap-2">
+                      {quickCompare.map((s) => (
+                        <div
+                          key={s.symbol}
+                          className="flex items-center gap-2 bg-[#f8f9fd] dark:bg-[#131722] border border-[#e0e3eb] dark:border-[#2a2e39] px-2 py-1 rounded-sm"
+                        >
+                          <span className="text-xs font-bold text-[#131722] dark:text-[#d1d4dc]">{s.symbol}</span>
+                          <span className="text-xs text-[#787b86]">{s.price.toFixed(2)}</span>
+                          <span className={`text-xs font-medium ${s.change >= 0 ? 'text-[#00bfa5]' : 'text-[#f23645]'}`}>
+                            {s.change >= 0 ? '+' : ''}{s.changePercent}%
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Metrics */}
+              <div className="col-span-12 md:col-span-6 xl:col-span-3 bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] rounded-sm p-4">
                 <RangeBar
                   low={metrics.dayRange.low}
                   high={metrics.dayRange.high}
@@ -329,142 +410,120 @@ const MyResearchesView: React.FC = () => {
                 />
 
                 <div className="space-y-2 mt-4">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-[#787b86]">Previous Close</span>
-                    <span className="text-[#131722] dark:text-[#d1d4dc] font-medium">{metrics.previousClose}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-[#787b86]">Average Volume</span>
-                    <span className="text-[#131722] dark:text-[#d1d4dc] font-medium">{metrics.averageVolume}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-[#787b86]">Market Cap</span>
-                    <span className="text-[#131722] dark:text-[#d1d4dc] font-medium">{metrics.marketCap}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-[#787b86]">Shares Outstanding</span>
-                    <span className="text-[#131722] dark:text-[#d1d4dc] font-medium">{metrics.sharesOutstanding}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-[#787b86]">EPS (TTM)</span>
-                    <span className="text-[#131722] dark:text-[#d1d4dc] font-medium">{metrics.eps}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-[#787b86]">P/E (TTM)</span>
-                    <span className="text-[#131722] dark:text-[#d1d4dc] font-medium">{metrics.peRatio ?? '-'}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-[#787b86]">Fwd Dividend (% Yield)</span>
-                    <span className="text-[#131722] dark:text-[#d1d4dc] font-medium">{metrics.fwdDividend ?? '-'}</span>
-                  </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-[#787b86]">Ex-Dividend Date</span>
-                    <span className="text-[#131722] dark:text-[#d1d4dc] font-medium">{metrics.exDividendDate ?? '-'}</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Analyst & Investor Info */}
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] p-3 rounded-sm">
-                    <div className="text-xs text-[#787b86] mb-1">Analyst</div>
-                    <div className="text-lg font-bold text-[#00bfa5]">{analystData.rating}</div>
-                    <div className="text-xs text-[#787b86]">{analystData.count} analysts</div>
-                  </div>
-                  <div className="bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] p-3 rounded-sm">
-                    <div className="text-xs text-[#787b86] mb-1">Target Price</div>
-                    <div className="text-lg font-bold text-[#131722] dark:text-[#d1d4dc]">{analystData.targetPrice} <span className="text-xs text-[#787b86]">USD</span></div>
-                    <div className="text-xs text-[#787b86]">{analystData.count} analysts</div>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] p-3 rounded-sm">
-                    <div className="text-xs text-[#787b86] mb-1">Earnings</div>
-                    <div className="text-xs text-[#787b86]">EPS Forecast</div>
-                    <div className={`text-lg font-bold ${analystData.forecast === 'Up' ? 'text-[#00bfa5]' : 'text-[#f23645]'}`}>
-                      ↗ {analystData.forecast}
+                  {[
+                    { k: 'Open', v: '28.73' },
+                    { k: 'Previous Close', v: String(metrics.previousClose) },
+                    { k: 'Average Volume', v: metrics.averageVolume },
+                    { k: 'Market Cap', v: metrics.marketCap },
+                    { k: 'Shares Outstanding', v: metrics.sharesOutstanding },
+                    { k: 'EPS (TTM)', v: String(metrics.eps) },
+                    { k: 'P/E (TTM)', v: metrics.peRatio ?? '-' },
+                    { k: 'Fwd Dividend (% Yield)', v: metrics.fwdDividend ?? '-' },
+                    { k: 'Ex-Dividend Date', v: metrics.exDividendDate ?? '-' },
+                  ].map((row) => (
+                    <div key={row.k} className="flex justify-between text-sm">
+                      <span className="text-[#787b86]">{row.k}</span>
+                      <span className="text-[#131722] dark:text-[#d1d4dc] font-medium">{row.v}</span>
                     </div>
-                    <div className="text-xs text-[#787b86]">{analystData.nextQuarter}</div>
-                  </div>
-                  <div className="bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] p-3 rounded-sm">
-                    <div className="text-xs text-[#787b86] mb-1">Investor</div>
-                    <div className="text-xs text-[#787b86]">Top Seller</div>
-                    <div className="text-sm font-bold text-[#131722] dark:text-[#d1d4dc] truncate">{analystData.topSeller}</div>
-                    <div className="text-xs text-[#f23645]">{analystData.topSellerChange}</div>
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-2">
-                  <div className="bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] p-3 rounded-sm">
-                    <div className="text-xs text-[#787b86] mb-1">Financials</div>
-                    <div className="text-xs text-[#787b86]">Valuation</div>
-                    <div className="text-lg font-bold text-[#131722] dark:text-[#d1d4dc]">High <span className="text-xs text-[#787b86]">P/S</span></div>
-                    <div className="text-xs text-[#787b86]">7.40 x</div>
-                  </div>
-                  <div className="bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] p-3 rounded-sm">
-                    <div className="text-xs text-[#787b86] mb-1">Trading</div>
-                    <div className="text-xs text-[#787b86]">Volume</div>
-                    <div className="text-lg font-bold text-[#131722] dark:text-[#d1d4dc]">High</div>
-                    <div className="text-xs text-[#787b86]">2.18 x</div>
-                  </div>
+                  ))}
                 </div>
               </div>
 
-              {/* Radar Chart */}
-              <div className="bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] p-4 rounded-sm">
-                <div className="w-full h-48">
+              {/* Analyst/Investor cards */}
+              <div className="col-span-12 md:col-span-6 xl:col-span-2 grid grid-cols-2 gap-2">
+                <div className="bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] p-3 rounded-sm">
+                  <div className="text-xs text-[#787b86] mb-1">Analyst</div>
+                  <div className="text-sm font-bold text-[#00bfa5] truncate">{analystData.rating}</div>
+                  <div className="text-xs text-[#787b86]">{analystData.count} analysts</div>
+                </div>
+                <div className="bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] p-3 rounded-sm">
+                  <div className="text-xs text-[#787b86] mb-1">Analyst</div>
+                  <div className="text-xs text-[#787b86]">Target Price</div>
+                  <div className="text-sm font-bold text-[#131722] dark:text-[#d1d4dc]">{analystData.targetPrice} <span className="text-[10px] text-[#787b86]">USD</span></div>
+                  <div className="text-xs text-[#787b86]">{analystData.count} analysts</div>
+                </div>
+
+                <div className="bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] p-3 rounded-sm">
+                  <div className="text-xs text-[#787b86] mb-1">Earnings</div>
+                  <div className="text-xs text-[#787b86]">EPS Forecast</div>
+                  <div className={`text-sm font-bold ${analystData.forecast === 'Up' ? 'text-[#00bfa5]' : analystData.forecast === 'Down' ? 'text-[#f23645]' : 'text-[#787b86]'}`}>
+                    ↗ {analystData.forecast}
+                  </div>
+                  <div className="text-xs text-[#787b86]">{analystData.nextQuarter}</div>
+                </div>
+                <div className="bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] p-3 rounded-sm">
+                  <div className="text-xs text-[#787b86] mb-1">Investor</div>
+                  <div className="text-xs text-[#787b86]">Top Seller</div>
+                  <div className="text-sm font-bold text-[#131722] dark:text-[#d1d4dc] truncate">{analystData.topSeller}</div>
+                  <div className="text-xs text-[#f23645] truncate">{analystData.topSellerChange}</div>
+                </div>
+
+                <div className="bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] p-3 rounded-sm">
+                  <div className="text-xs text-[#787b86] mb-1">Financials</div>
+                  <div className="text-xs text-[#787b86]">Valuation</div>
+                  <div className="text-sm font-bold text-[#f59e0b]">High <span className="text-[10px] text-[#787b86]">P/S</span></div>
+                  <div className="text-xs text-[#787b86]">7.40 x</div>
+                </div>
+                <div className="bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] p-3 rounded-sm">
+                  <div className="text-xs text-[#787b86] mb-1">Trading</div>
+                  <div className="text-xs text-[#787b86]">Volume</div>
+                  <div className="text-sm font-bold text-[#00bfa5]">High</div>
+                  <div className="text-xs text-[#787b86]">2.18 x</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom layout (AI Insights + Radar + Top stories) */}
+            <div className="grid grid-cols-12 gap-4">
+              {/* AI Insights */}
+              <div className="col-span-12 xl:col-span-7 bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] rounded-sm p-4">
+                <h3 className="text-sm font-bold text-[#131722] dark:text-[#d1d4dc] mb-3">AI Insights</h3>
+                <div className="space-y-2">
+                  {aiInsights.map((insight, i) => (
+                    <div key={i} className="flex items-start gap-3 py-1">
+                      <div className={`w-2 h-2 rounded-full mt-1.5 ${insight.type === 'positive' ? 'bg-[#00bfa5]' : insight.type === 'negative' ? 'bg-[#f23645]' : 'bg-[#787b86]'}`} />
+                      <span className="text-sm text-[#131722] dark:text-[#d1d4dc] flex-1">{insight.text}</span>
+                      {insight.expandable && (
+                        <Icons.ChevronDown className="w-4 h-4 text-[#787b86]" />
+                      )}
+                    </div>
+                  ))}
+                </div>
+                <button className="text-xs text-[#2962ff] mt-3 hover:underline">See more ∨</button>
+              </div>
+
+              {/* Radar */}
+              <div className="col-span-12 md:col-span-6 xl:col-span-3 bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] rounded-sm p-4">
+                <div className="w-full h-56">
                   <RadarChart metrics={radarMetrics} />
                 </div>
               </div>
-            </div>
 
-            {/* AI Insights */}
-            <div className="bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] p-4 rounded-sm">
-              <h3 className="text-sm font-bold text-[#131722] dark:text-[#d1d4dc] mb-4 flex items-center gap-2">
-                <Icons.AI className="w-4 h-4 text-[#2962ff]" />
-                AI Insights
-              </h3>
-              <div className="space-y-2">
-                {aiInsights.map((insight, i) => (
-                  <div key={i} className="flex items-start gap-3 py-2 hover:bg-[#f8f9fd] dark:hover:bg-[#2a2e39] px-2 rounded cursor-pointer group">
-                    <div className={`w-2 h-2 rounded-full mt-1.5 ${insight.type === 'positive' ? 'bg-[#00bfa5]' :
-                      insight.type === 'negative' ? 'bg-[#f23645]' :
-                        'bg-[#787b86]'
-                      }`} />
-                    <span className="text-sm text-[#131722] dark:text-[#d1d4dc] flex-1">{insight.text}</span>
-                    {insight.expandable && (
-                      <Icons.ChevronDown className="w-4 h-4 text-[#787b86] opacity-0 group-hover:opacity-100 transition-opacity" />
-                    )}
-                  </div>
-                ))}
-              </div>
-              <button className="text-xs text-[#2962ff] mt-3 hover:underline">See more ∨</button>
-            </div>
-
-            {/* Top Stories */}
-            <div className="bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] p-4 rounded-sm">
-              <h3 className="text-sm font-bold text-[#131722] dark:text-[#d1d4dc] mb-4">Top stories</h3>
-              <div className="space-y-4">
-                {topStories.map((story) => (
-                  <div key={story.id} className="flex gap-3 cursor-pointer group">
-                    <div className="w-8 h-8 bg-[#2962ff]/10 rounded-full flex items-center justify-center flex-shrink-0">
-                      <Icons.News className="w-4 h-4 text-[#2962ff]" />
-                    </div>
-                    <div className="flex-1">
-                      <div className="text-xs text-[#787b86] mb-1">
-                        <span className="text-[#2962ff]">{story.source}</span> · {story.time}
+              {/* Top stories */}
+              <div className="col-span-12 md:col-span-6 xl:col-span-2 bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] rounded-sm p-4">
+                <h3 className="text-sm font-bold text-[#131722] dark:text-[#d1d4dc] mb-3">Top stories</h3>
+                <div className="space-y-3">
+                  {topStories.map((story) => (
+                    <div key={story.id} className="flex gap-2 cursor-pointer group">
+                      <div className="mt-0.5 w-5 h-5 rounded bg-[#f23645]/10 flex items-center justify-center flex-shrink-0">
+                        <Icons.News className="w-3.5 h-3.5 text-[#f23645]" />
                       </div>
-                      <h4 className="text-sm font-medium text-[#131722] dark:text-[#d1d4dc] group-hover:text-[#2962ff] transition-colors">
-                        {story.title}
-                      </h4>
-                      <p className="text-xs text-[#787b86] line-clamp-1">{story.summary}</p>
+                      <div className="min-w-0">
+                        <div className="text-[10px] text-[#787b86]">
+                          <span className="font-semibold text-[#131722] dark:text-[#d1d4dc]">{story.source}</span> · {story.time}
+                        </div>
+                        <div className="text-xs font-medium text-[#131722] dark:text-[#d1d4dc] group-hover:text-[#2962ff] transition-colors line-clamp-2">
+                          {story.title}
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </div>
           </div>
         );
+      }
 
       case 'forum':
         return (

@@ -587,7 +587,7 @@ const MyResearchesView: React.FC = () => {
   };
 
   return (
-    <div className="flex-1 flex flex-col overflow-hidden bg-[#f8f9fd] dark:bg-[#131722]">
+    <div className="flex-1 overflow-y-auto bg-[#f8f9fd] dark:bg-[#131722]">
       {/* Watchlist Section */}
       <div className="p-6 border-b border-[#e0e3eb] dark:border-[#2a2e39]">
         <div className="flex items-center justify-between mb-4">
@@ -687,7 +687,7 @@ const MyResearchesView: React.FC = () => {
       </div>
 
       {/* Horizontal Tabs */}
-      <div className="border-b border-[#e0e3eb] dark:border-[#2a2e39] bg-white dark:bg-[#1e222d]">
+      <div className="sticky top-0 z-10 border-b border-[#e0e3eb] dark:border-[#2a2e39] bg-white dark:bg-[#1e222d]">
         <div className="flex overflow-x-auto px-6">
           {TABS.map((tab) => (
             <button
@@ -705,7 +705,7 @@ const MyResearchesView: React.FC = () => {
       </div>
 
       {/* Tab Content */}
-      <div className="flex-1 overflow-y-auto p-6">
+      <div className="p-6">
         {renderTabContent()}
       </div>
     </div>

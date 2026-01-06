@@ -30,7 +30,7 @@ export interface NewsItem {
   imageUrl?: string;
 }
 
-export type ViewState = 'home' | 'dashboard' | 'markets' | 'research' | 'ai-analyst' | 'my-researches';
+export type ViewState = 'home' | 'dashboard' | 'markets' | 'research' | 'ai-analyst' | 'my-researches' | 'settings';
 
 export interface AIAnalysisResult {
   summary: string;

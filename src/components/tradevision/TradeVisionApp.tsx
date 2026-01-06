@@ -6,6 +6,7 @@ import { MOCK_STOCKS, MOCK_NEWS, MOCK_INDICES, MOCK_CALENDAR, generateChartData 
 import ChartWidget from './ChartWidget';
 import ResearchSection from './ResearchSection';
 import MyResearchesView from './MyResearchesView';
+import SettingsView from './SettingsView';
 import { useAuth } from '@/contexts/AuthContext';
 import StockSearch from './StockSearch';
 
@@ -119,7 +120,7 @@ const TradeVisionApp: React.FC = () => {
                     <ToolbarButton icon={Icons.List} active={rightPanelOpen} onClick={() => setRightPanelOpen(!rightPanelOpen)} tooltip="Watchlist" />
 
                     <div className="mt-auto flex flex-col gap-2">
-                        <ToolbarButton icon={Icons.Settings} active={false} tooltip="Settings" />
+                        <ToolbarButton icon={Icons.Settings} active={activeView === 'settings'} onClick={() => setActiveView('settings')} tooltip="Settings" />
                     </div>
                 </aside>
 
@@ -130,6 +131,7 @@ const TradeVisionApp: React.FC = () => {
                     {activeView === 'markets' && <FullChartMode />}
                     {activeView === 'dashboard' && <MarketOverviewMode />}
                     {activeView === 'my-researches' && <MyResearchesView />}
+                    {activeView === 'settings' && <SettingsView />}
                 </main>
 
                 {/* RIGHT SIDEBAR (Watchlist) - Toggleable */}

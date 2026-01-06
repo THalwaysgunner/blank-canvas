@@ -1,1 +1,4 @@
 project_id = "lizazxfnmnuuyxcgvhqh"
+
+[functions.import-stocks]
+verify_jwt = false

@@ -1,15 +1,26 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Theme, ViewState } from '@/types';
 import { Icons } from './Icons';
 import { MOCK_STOCKS, MOCK_NEWS, MOCK_INDICES, MOCK_CALENDAR, generateChartData } from '@/constants';
 import ChartWidget from './ChartWidget';
 import ResearchSection from './ResearchSection';
 import MyResearchesView from './MyResearchesView';
+import { useAuth } from '@/contexts/AuthContext';
 
 const TradeVisionApp: React.FC = () => {
+    const { user, loading, signOut } = useAuth();
+    const navigate = useNavigate();
     const [theme, setTheme] = useState<Theme>(Theme.LIGHT);
     const [activeView, setActiveView] = useState<ViewState>('home');
-    const [rightPanelOpen, setRightPanelOpen] = useState(false); // Closed by default on home
+    const [rightPanelOpen, setRightPanelOpen] = useState(false);
+
+    // Redirect to auth if not logged in
+    useEffect(() => {
+        if (!loading && !user) {
+            navigate('/auth');
+        }
+    }, [user, loading, navigate]);
 
     // Handle Theme Changes
     useEffect(() => {
@@ -23,6 +34,19 @@ const TradeVisionApp: React.FC = () => {
     const toggleTheme = () => {
         setTheme(prev => prev === Theme.DARK ? Theme.LIGHT : Theme.DARK);
     };
+
+    const handleSignOut = async () => {
+        await signOut();
+        navigate('/auth');
+    };
+
+    if (loading) {
+        return (
+            <div className="flex items-center justify-center h-screen bg-[#f8f9fd] dark:bg-[#131722]">
+                <div className="w-8 h-8 border-2 border-[#2962ff] border-t-transparent rounded-full animate-spin" />
+            </div>
+        );
+    }
 
     return (
         <div className="flex flex-col h-screen w-full bg-[#ffffff] dark:bg-[#131722] text-[#131722] dark:text-[#d1d4dc] overflow-hidden font-sans transition-colors duration-200">
@@ -68,14 +92,20 @@ const TradeVisionApp: React.FC = () => {
 
                     <div className="h-5 w-[1px] bg-[#e0e3eb] dark:bg-[#2a2e39]" />
 
-                    <button className="hidden sm:flex items-center gap-2 text-[#131722] dark:text-[#d1d4dc] font-medium text-sm hover:text-[#2962ff] transition-colors">
-                        <Icons.User className="w-5 h-5" />
-                        <span>Sign In</span>
-                    </button>
-
-                    <button className="bg-[#2962ff] text-white text-sm font-semibold px-5 py-2 rounded-md hover:bg-[#1e53e5] transition-colors shadow-sm">
-                        Get Started
-                    </button>
+                    {user && (
+                        <>
+                            <div className="hidden sm:flex items-center gap-2 text-[#131722] dark:text-[#d1d4dc] text-sm">
+                                <Icons.User className="w-5 h-5" />
+                                <span className="max-w-[120px] truncate">{user.email}</span>
+                            </div>
+                            <button
+                                onClick={handleSignOut}
+                                className="bg-[#f23645] text-white text-sm font-semibold px-4 py-2 rounded-md hover:bg-[#d52f3d] transition-colors shadow-sm"
+                            >
+                                Sign Out
+                            </button>
+                        </>
+                    )}
                 </div>
             </header>
 

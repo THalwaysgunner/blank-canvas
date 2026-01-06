@@ -293,6 +293,7 @@ const MyResearchesView: React.FC = () => {
   const analystData = generateMockAnalystData();
   const topStories = generateMockTopStories();
   const forumPosts = generateMockForumPosts();
+  const chartData = useMemo(() => generateChartData(90), []);
 
   const selectedStockData = MOCK_STOCKS.find(s => s.symbol === selectedStock);
 

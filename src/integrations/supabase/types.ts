@@ -41,6 +41,24 @@ export type Database = {
         }
         Relationships: []
       }
+      stocks: {
+        Row: {
+          company_name: string
+          id: number
+          symbol: string
+        }
+        Insert: {
+          company_name: string
+          id?: number
+          symbol: string
+        }
+        Update: {
+          company_name?: string
+          id?: number
+          symbol?: string
+        }
+        Relationships: []
+      }
       watchlists: {
         Row: {
           added_at: string

@@ -1,17 +1,23 @@
 import React, { useMemo, useState } from 'react';
+import FinancialsView from './FinancialsView';
+import StockNewsView from './StockNewsView';
+import CompanyProfileView from './CompanyProfileView';
+import ForumView from './ForumView';
+import InsightsView from './InsightsView';
 import { Icons } from './Icons';
 import { MOCK_STOCKS, generateChartData } from '@/constants';
 import ChartWidget from './ChartWidget';
 
-type TabKey = 'summary' | 'managements' | 'financial' | 'evaluation' | 'insights' | 'financial-variables' | 'forum';
+type TabKey = 'summary' | 'profile' | 'financial' | 'evaluation' | 'insights' | 'financial-variables' | 'news' | 'forum';
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'summary', label: 'Summary' },
-  { key: 'managements', label: 'Managements' },
+  { key: 'profile', label: 'Profile' },
   { key: 'financial', label: 'Financial' },
   { key: 'evaluation', label: 'Evaluation' },
   { key: 'insights', label: 'Insights' },
   { key: 'financial-variables', label: 'Financial Variables' },
+  { key: 'news', label: 'News' },
   { key: 'forum', label: 'Forum' },
 ];
 
@@ -282,9 +288,20 @@ const RangeBar: React.FC<{ low: number; high: number; current: number; label: st
   );
 };
 
-const MyResearchesView: React.FC = () => {
+interface MyResearchesViewProps {
+  initialSymbol?: string;
+}
+
+const MyResearchesView: React.FC<MyResearchesViewProps> = ({ initialSymbol }) => {
   const [activeTab, setActiveTab] = useState<TabKey>('summary');
-  const [selectedStock, setSelectedStock] = useState<string | null>(MOCK_STOCKS[0]?.symbol || null);
+  const [selectedStock, setSelectedStock] = useState<string | null>(initialSymbol || MOCK_STOCKS[0]?.symbol || null);
+
+  // Update selected stock if initialSymbol changes
+  React.useEffect(() => {
+    if (initialSymbol) {
+      setSelectedStock(initialSymbol);
+    }
+  }, [initialSymbol]);
 
   // Mock data
   const metrics = generateMockMetrics();
@@ -327,10 +344,6 @@ const MyResearchesView: React.FC = () => {
                   {stock.name} ({stock.symbol})
                 </h2>
               </div>
-              <button className="shrink-0 flex items-center gap-2 bg-[#2962ff] text-white text-sm font-medium px-3 py-2 rounded-lg hover:bg-[#1e53e5] transition-colors">
-                <Icons.Plus className="w-4 h-4" />
-                Watchlist
-              </button>
             </div>
 
             <div className="flex items-end gap-4 flex-wrap">
@@ -493,7 +506,6 @@ const MyResearchesView: React.FC = () => {
                 <button className="text-xs text-[#2962ff] mt-3 hover:underline">See more ∨</button>
               </div>
 
-              {/* Radar */}
               <div className="col-span-12 md:col-span-6 xl:col-span-3 bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] rounded-sm p-4">
                 <div className="w-full h-56">
                   <RadarChart metrics={radarMetrics} />
@@ -526,48 +538,20 @@ const MyResearchesView: React.FC = () => {
         );
       }
 
-      case 'forum':
-        return (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-[#131722] dark:text-[#d1d4dc]">Community Discussion</h3>
-              <button className="px-4 py-2 bg-[#2962ff] text-white text-sm font-medium rounded hover:bg-[#1e53e5] transition-colors">
-                New Post
-              </button>
-            </div>
+      case 'profile':
+        return <CompanyProfileView />;
 
-            <div className="space-y-3">
-              {forumPosts.map((post) => (
-                <div
-                  key={post.id}
-                  className="bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] p-4 rounded-sm hover:border-[#2962ff]/50 transition-colors cursor-pointer"
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <div className="w-8 h-8 bg-[#2962ff]/10 rounded-full flex items-center justify-center">
-                      <Icons.User className="w-4 h-4 text-[#2962ff]" />
-                    </div>
-                    <div>
-                      <span className="text-sm font-medium text-[#131722] dark:text-[#d1d4dc]">{post.author}</span>
-                      <span className="text-xs text-[#787b86] ml-2">{post.time}</span>
-                    </div>
-                  </div>
-                  <h4 className="text-sm font-bold text-[#131722] dark:text-[#d1d4dc] mb-2">{post.title}</h4>
-                  <p className="text-xs text-[#787b86] line-clamp-2 mb-3">{post.content}</p>
-                  <div className="flex items-center gap-4 text-xs text-[#787b86]">
-                    <span className="flex items-center gap-1">
-                      <Icons.TrendingUp className="w-3 h-3" />
-                      {post.likes} likes
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Icons.Message className="w-3 h-3" />
-                      {post.replies} replies
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        );
+      case 'news':
+        return <StockNewsView />;
+
+      case 'forum':
+        return <ForumView />;
+
+      case 'financial':
+        return <FinancialsView />;
+
+      case 'insights':
+        return <InsightsView />;
 
       default:
         return (
@@ -592,27 +576,16 @@ const MyResearchesView: React.FC = () => {
       <div className="p-6 border-b border-[#e0e3eb] dark:border-[#2a2e39]">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-[#131722] dark:text-[#e0e3eb]">Watchlist</h1>
+            <h1 className="text-2xl font-bold text-[#131722] dark:text-[#e0e3eb]">My Research</h1>
             <p className="text-sm text-[#787b86]">
               Updated {new Date().toLocaleDateString('en-US', { day: '2-digit', month: '2-digit', year: 'numeric' })} at {new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
             </p>
           </div>
-          <button className="flex items-center gap-2 bg-[#2962ff] text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-[#1e53e5] transition-colors">
-            <Icons.Plus className="w-4 h-4" />
-            Watchlist
-          </button>
         </div>
 
         {/* Controls */}
         <div className="flex items-center gap-4 mb-4">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-[#787b86]">Watchlist</span>
-            <Icons.ChevronDown className="w-4 h-4 text-[#787b86]" />
-          </div>
-          <button className="p-2 hover:bg-[#e0e3eb] dark:hover:bg-[#2a2e39] rounded transition-colors">
-            <Icons.Plus className="w-4 h-4 text-[#787b86]" />
-          </button>
-          <div className="flex-1 max-w-xs">
+          <div className="flex-1">
             <div className="relative">
               <Icons.Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#787b86]" />
               <input
@@ -634,7 +607,7 @@ const MyResearchesView: React.FC = () => {
                 <th className="text-right px-4 py-3 text-xs font-semibold text-[#787b86] uppercase tracking-wider">Value</th>
                 <th className="text-right px-4 py-3 text-xs font-semibold text-[#787b86] uppercase tracking-wider">Balance</th>
                 <th className="text-center px-4 py-3 text-xs font-semibold text-[#787b86] uppercase tracking-wider">Chart</th>
-                <th className="text-center px-4 py-3 text-xs font-semibold text-[#787b86] uppercase tracking-wider"></th>
+                <th className="text-center px-4 py-3 text-xs font-semibold text-[#787b86] uppercase tracking-wider">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -642,18 +615,18 @@ const MyResearchesView: React.FC = () => {
                 <tr
                   key={stock.symbol}
                   onClick={() => setSelectedStock(stock.symbol)}
-                  className={`border-b border-[#e0e3eb] dark:border-[#2a2e39] last:border-0 cursor-pointer transition-colors
-                    ${selectedStock === stock.symbol 
-                      ? 'bg-[#2962ff]/10 dark:bg-[#2962ff]/20' 
+                  className={`border-b border-[#e0e3eb] dark:border-[#2a2e39] last:border-0 cursor-pointer transition-colors group
+                    ${selectedStock === stock.symbol
+                      ? 'bg-[#2962ff]/10 dark:bg-[#2962ff]/20'
                       : 'hover:bg-[#f0f3fa] dark:hover:bg-[#2a2e39]'}`}
                 >
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-xs
-                        ${index % 5 === 0 ? 'bg-gray-800' : 
-                          index % 5 === 1 ? 'bg-amber-500' : 
-                          index % 5 === 2 ? 'bg-red-500' : 
-                          index % 5 === 3 ? 'bg-blue-500' : 'bg-cyan-500'}`}>
+                        ${index % 5 === 0 ? 'bg-gray-800' :
+                          index % 5 === 1 ? 'bg-amber-500' :
+                            index % 5 === 2 ? 'bg-red-500' :
+                              index % 5 === 3 ? 'bg-blue-500' : 'bg-cyan-500'}`}>
                         {stock.symbol.charAt(0)}
                       </div>
                       <div>
@@ -675,9 +648,30 @@ const MyResearchesView: React.FC = () => {
                     <MiniChart positive={stock.change >= 0} />
                   </td>
                   <td className="px-4 py-3 text-center">
-                    <button className="bg-[#2962ff] text-white text-xs font-medium px-4 py-1.5 rounded hover:bg-[#1e53e5] transition-colors">
-                      Buy
-                    </button>
+                    {/* Hover Actions */}
+                    <div className="flex justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button
+                        className="w-8 h-8 rounded-full bg-[#f0f3fa] dark:bg-[#2a2e39] flex items-center justify-center text-[#131722] dark:text-[#d1d4dc] hover:bg-[#2962ff] hover:text-white transition-colors"
+                        onClick={(e) => { e.stopPropagation(); }}
+                      >
+                        <Icons.Plus className="w-4 h-4" />
+                      </button>
+                      <button
+                        className="w-8 h-8 rounded-full bg-[#f0f3fa] dark:bg-[#2a2e39] flex items-center justify-center text-[#131722] dark:text-[#d1d4dc] hover:bg-[#f23645] hover:text-white transition-colors"
+                        onClick={(e) => { e.stopPropagation(); }}
+                      >
+                        <Icons.Minus className="w-4 h-4" />
+                      </button>
+                      <button
+                        className="w-8 h-8 rounded-full bg-[#f0f3fa] dark:bg-[#2a2e39] flex items-center justify-center text-[#131722] dark:text-[#d1d4dc] hover:bg-[#2962ff] hover:text-white transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedStock(stock.symbol);
+                        }}
+                      >
+                        <Icons.Search className="w-4 h-4" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}

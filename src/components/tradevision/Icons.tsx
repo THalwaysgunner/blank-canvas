@@ -51,7 +51,8 @@ import {
     Gamepad2,
     SlidersHorizontal,
     GraduationCap,
-    Briefcase
+    Briefcase,
+    LogIn,
 } from 'lucide-react';
 
 export const Icons = {
@@ -108,5 +109,6 @@ export const Icons = {
     Game: Gamepad2,
     Sliders: SlidersHorizontal,
     Education: GraduationCap,
-    Management: Briefcase
+    Management: Briefcase,
+    LogIn
 };

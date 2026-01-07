@@ -12,7 +12,12 @@ import { useAuth } from '@/contexts/AuthContext';
 import StockSearch from './StockSearch';
 import { NotificationInboxPopover } from "@/components/ui/notification-inbox-popover";
 import { Button } from "@/components/ui/button";
+
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { HorizonHeroSection } from "@/components/ui/horizon-hero-section";
+import { AuthForm } from "@/pages/Auth";
+import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 
 const TradeVisionApp: React.FC = () => {
     const { user, loading, signOut } = useAuth();
@@ -24,13 +29,10 @@ const TradeVisionApp: React.FC = () => {
     const [researchTargetSymbol, setResearchTargetSymbol] = useState<string | undefined>(undefined);
 
     const [navOpen, setNavOpen] = useState(true);
+    const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
     // Redirect to auth if not logged in
-    useEffect(() => {
-        if (!loading && !user) {
-            navigate('/auth');
-        }
-    }, [user, loading, navigate]);
+
 
     // Handle Theme Changes
     useEffect(() => {
@@ -64,183 +66,206 @@ const TradeVisionApp: React.FC = () => {
         );
     }
 
+    if (!user) {
+        return (
+            <div className="relative w-full bg-black min-h-screen">
+                <HorizonHeroSection />
+                <div className="fixed top-6 right-6 z-50">
+                    <Dialog open={isLoginModalOpen} onOpenChange={setIsLoginModalOpen}>
+                        <DialogTrigger asChild>
+                            <Button variant="outline" className="bg-black/20 text-white border-white/20 hover:bg-white/10 hover:text-white backdrop-blur-md transition-all">
+                                <Icons.LogIn className="w-4 h-4 mr-2" />
+                                Login
+                            </Button>
+                        </DialogTrigger>
+                        <DialogContent className="bg-transparent border-none shadow-none p-0 max-w-md w-full">
+                            <AuthForm onSuccess={() => setIsLoginModalOpen(false)} />
+                        </DialogContent>
+                    </Dialog>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <TooltipProvider>
             <div className="flex h-screen w-full bg-[#ffffff] dark:bg-[#131722] text-[#131722] dark:text-[#d1d4dc] overflow-hidden font-sans transition-colors duration-200">
 
                 {/* LEFT TOOLBAR (Navigation) - Toggleable & Full Height */}
-                <div className={`relative flex flex-col bg-white dark:bg-[#131722] border-r border-[#e0e3eb] dark:border-[#2a2e39] transition-all duration-300 z-30 ${navOpen ? 'w-[240px]' : 'w-[60px]'}`}>
+                {user && (
+                    <div className={`relative flex flex-col bg-white dark:bg-[#131722] border-r border-[#e0e3eb] dark:border-[#2a2e39] transition-all duration-300 z-30 ${navOpen ? 'w-[240px]' : 'w-[60px]'}`}>
 
-                    {/* Logo Section inside Sidebar */}
-                    <div className="h-[60px] min-h-[60px] flex items-center px-4 mb-2">
-                        <div
-                            className="flex items-center gap-2 cursor-pointer group"
-                            onClick={() => setActiveView('home')}
-                        >
-                            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[#2962ff] font-bold text-lg shadow-sm group-hover:bg-[#f0f3fa] dark:group-hover:bg-[#2a2e39] transition-colors">
-                                {/* Using simple orange diamond-like shape or icon from reference, keeping existing icon but styling it */}
-                                <Icons.TrendingUp className="w-6 h-6" />
-                            </div>
-                            <div className={`flex flex-col overflow-hidden transition-opacity duration-300 ${navOpen ? 'opacity-100' : 'opacity-0 w-0'}`}>
-                                <span className="font-bold tracking-tight text-lg leading-none text-[#131722] dark:text-[#e0e3eb] whitespace-nowrap">Headername</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <aside className="flex-1 flex flex-col items-center py-2 overflow-y-auto overflow-x-hidden custom-scrollbar">
-                        <div className="w-full px-3 flex flex-col gap-1">
-                            <ToolbarButton
-                                icon={Icons.Dashboard}
-                                label="Home"
-                                active={activeView === 'home'}
+                        {/* Logo Section inside Sidebar */}
+                        <div className="h-[60px] min-h-[60px] flex items-center px-4 mb-2">
+                            <div
+                                className="flex items-center gap-2 cursor-pointer group"
                                 onClick={() => setActiveView('home')}
-                                showLabel={navOpen}
-                                tooltip="Home"
-                            />
-                            <ToolbarButton
-                                icon={Icons.Markets}
-                                label="Markets"
-                                active={activeView === 'markets'}
-                                onClick={() => setActiveView('markets')}
-                                showLabel={navOpen}
-                                tooltip="Markets"
-                            />
-                            <ToolbarButton
-                                icon={Icons.AI}
-                                label="My Portfolio"
-                                active={activeView === 'research'}
-                                onClick={() => setActiveView('research')}
-                                showLabel={navOpen}
-                                tooltip="My Portfolio"
-                            />
-                            <ToolbarButton
-                                icon={Icons.FolderSearch}
-                                label="My Researches"
-                                active={activeView === 'my-researches'}
-                                onClick={() => setActiveView('my-researches')}
-                                showLabel={navOpen}
-                                tooltip="My Researches"
-                            />
-                        </div>
-
-                        <div className="w-full px-3 my-2">
-                            <div className="h-[1px] bg-[#e0e3eb] dark:bg-[#2a2e39]" />
-                        </div>
-
-                        <div className="w-full px-3 flex flex-col gap-1">
-                            <ToolbarButton
-                                icon={Icons.List}
-                                label="Watchlist"
-                                active={rightPanelOpen}
-                                onClick={() => setRightPanelOpen(!rightPanelOpen)}
-                                showLabel={navOpen}
-                                tooltip="Watchlist"
-                            />
-
-                            {/* Educational Section */}
-                            {navOpen ? (
-                                <>
-                                    <div className="mt-4 mb-2 px-3 transition-opacity duration-300">
-                                        <span className="text-xs font-semibold text-[#b2b5be] uppercase tracking-wider">Educational</span>
-                                    </div>
-                                    <div className="flex flex-col gap-1 pl-3">
-                                        <ToolbarButton
-                                            label="Knowledge Base"
-                                            active={false}
-                                            showLabel={true}
-                                            tooltip="Knowledge Base"
-                                        />
-                                        <ToolbarButton
-                                            label="Watchlist Management"
-                                            active={false}
-                                            showLabel={true}
-                                            tooltip="Watchlist Management"
-                                        />
-                                        <ToolbarButton
-                                            label="The Formula"
-                                            active={false}
-                                            showLabel={true}
-                                            tooltip="The Formula"
-                                        />
-                                        <ToolbarButton
-                                            label="Podcasts"
-                                            active={false}
-                                            showLabel={true}
-                                            tooltip="Podcasts"
-                                        />
-                                    </div>
-                                </>
-                            ) : (
-                                <div className="mt-2">
-                                    <ToolbarButton
-                                        icon={Icons.Education}
-                                        label="Educational"
-                                        active={false}
-                                        onClick={() => setNavOpen(true)}
-                                        showLabel={false}
-                                        tooltip="Educational"
-                                    />
+                            >
+                                <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[#2962ff] font-bold text-lg shadow-sm group-hover:bg-[#f0f3fa] dark:group-hover:bg-[#2a2e39] transition-colors">
+                                    {/* Using simple orange diamond-like shape or icon from reference, keeping existing icon but styling it */}
+                                    <Icons.TrendingUp className="w-6 h-6" />
                                 </div>
-                            )}
-
-                            {/* Management Section */}
-                            {navOpen ? (
-                                <>
-                                    <div className="mt-4 mb-2 px-3 transition-opacity duration-300">
-                                        <span className="text-xs font-semibold text-[#b2b5be] uppercase tracking-wider">Management</span>
-                                    </div>
-                                    <div className="flex flex-col gap-1 pl-3">
-                                        <ToolbarButton
-                                            label="My Notes"
-                                            active={false}
-                                            showLabel={true}
-                                            tooltip="My Notes"
-                                        />
-                                        <ToolbarButton
-                                            label="Simulations"
-                                            active={false}
-                                            showLabel={true}
-                                            tooltip="Simulations"
-                                        />
-                                    </div>
-                                </>
-                            ) : (
-                                <div className="mt-2">
-                                    <ToolbarButton
-                                        icon={Icons.Management}
-                                        label="Management"
-                                        active={false}
-                                        onClick={() => setNavOpen(true)}
-                                        showLabel={false}
-                                        tooltip="Management"
-                                    />
+                                <div className={`flex flex-col overflow-hidden transition-opacity duration-300 ${navOpen ? 'opacity-100' : 'opacity-0 w-0'}`}>
+                                    <span className="font-bold tracking-tight text-lg leading-none text-[#131722] dark:text-[#e0e3eb] whitespace-nowrap">Headername</span>
                                 </div>
-                            )}
+                            </div>
                         </div>
 
-                        <div className="mt-auto w-full px-3 flex flex-col gap-2 mb-4">
-                            <ToolbarButton
-                                icon={Icons.Settings}
-                                label="Settings"
-                                active={false}
-                                showLabel={navOpen}
-                                tooltip="Settings"
-                            />
-                        </div>
-                    </aside>
+                        <aside className="flex-1 flex flex-col items-center py-2 overflow-y-auto overflow-x-hidden custom-scrollbar">
+                            <div className="w-full px-3 flex flex-col gap-1">
+                                <ToolbarButton
+                                    icon={Icons.Dashboard}
+                                    label="Home"
+                                    active={activeView === 'home'}
+                                    onClick={() => setActiveView('home')}
+                                    showLabel={navOpen}
+                                    tooltip="Home"
+                                />
+                                <ToolbarButton
+                                    icon={Icons.Markets}
+                                    label="Markets"
+                                    active={activeView === 'markets'}
+                                    onClick={() => setActiveView('markets')}
+                                    showLabel={navOpen}
+                                    tooltip="Markets"
+                                />
+                                <ToolbarButton
+                                    icon={Icons.AI}
+                                    label="My Portfolio"
+                                    active={activeView === 'research'}
+                                    onClick={() => setActiveView('research')}
+                                    showLabel={navOpen}
+                                    tooltip="My Portfolio"
+                                />
+                                <ToolbarButton
+                                    icon={Icons.FolderSearch}
+                                    label="My Researches"
+                                    active={activeView === 'my-researches'}
+                                    onClick={() => setActiveView('my-researches')}
+                                    showLabel={navOpen}
+                                    tooltip="My Researches"
+                                />
+                            </div>
 
-                    {/* Left Nav Toggle Button */}
-                    {/* Left Nav Toggle Button */}
-                    <Button
-                        onClick={() => setNavOpen(!navOpen)}
-                        size="icon"
-                        variant="outline"
-                        className="absolute right-0 top-1/2 translate-x-1/2 z-40 shadow-md bg-background rounded-lg"
-                        aria-label={navOpen ? "Collapse Navigation" : "Expand Navigation"}
-                    >
-                        {navOpen ? <Icons.ChevronLeft size={16} /> : <Icons.ChevronRight size={16} />}
-                    </Button>
-                </div>
+                            <div className="w-full px-3 my-2">
+                                <div className="h-[1px] bg-[#e0e3eb] dark:bg-[#2a2e39]" />
+                            </div>
+
+                            <div className="w-full px-3 flex flex-col gap-1">
+                                <ToolbarButton
+                                    icon={Icons.List}
+                                    label="Watchlist"
+                                    active={rightPanelOpen}
+                                    onClick={() => setRightPanelOpen(!rightPanelOpen)}
+                                    showLabel={navOpen}
+                                    tooltip="Watchlist"
+                                />
+
+                                {/* Educational Section */}
+                                {navOpen ? (
+                                    <>
+                                        <div className="mt-4 mb-2 px-3 transition-opacity duration-300">
+                                            <span className="text-xs font-semibold text-[#b2b5be] uppercase tracking-wider">Educational</span>
+                                        </div>
+                                        <div className="flex flex-col gap-1 pl-3">
+                                            <ToolbarButton
+                                                label="Knowledge Base"
+                                                active={false}
+                                                showLabel={true}
+                                                tooltip="Knowledge Base"
+                                            />
+                                            <ToolbarButton
+                                                label="Watchlist Management"
+                                                active={false}
+                                                showLabel={true}
+                                                tooltip="Watchlist Management"
+                                            />
+                                            <ToolbarButton
+                                                label="The Formula"
+                                                active={false}
+                                                showLabel={true}
+                                                tooltip="The Formula"
+                                            />
+                                            <ToolbarButton
+                                                label="Podcasts"
+                                                active={false}
+                                                showLabel={true}
+                                                tooltip="Podcasts"
+                                            />
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="mt-2">
+                                        <ToolbarButton
+                                            icon={Icons.Education}
+                                            label="Educational"
+                                            active={false}
+                                            onClick={() => setNavOpen(true)}
+                                            showLabel={false}
+                                            tooltip="Educational"
+                                        />
+                                    </div>
+                                )}
+
+                                {/* Management Section */}
+                                {navOpen ? (
+                                    <>
+                                        <div className="mt-4 mb-2 px-3 transition-opacity duration-300">
+                                            <span className="text-xs font-semibold text-[#b2b5be] uppercase tracking-wider">Management</span>
+                                        </div>
+                                        <div className="flex flex-col gap-1 pl-3">
+                                            <ToolbarButton
+                                                label="My Notes"
+                                                active={false}
+                                                showLabel={true}
+                                                tooltip="My Notes"
+                                            />
+                                            <ToolbarButton
+                                                label="Simulations"
+                                                active={false}
+                                                showLabel={true}
+                                                tooltip="Simulations"
+                                            />
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="mt-2">
+                                        <ToolbarButton
+                                            icon={Icons.Management}
+                                            label="Management"
+                                            active={false}
+                                            onClick={() => setNavOpen(true)}
+                                            showLabel={false}
+                                            tooltip="Management"
+                                        />
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="mt-auto w-full px-3 flex flex-col gap-2 mb-4">
+                                <ToolbarButton
+                                    icon={Icons.Settings}
+                                    label="Settings"
+                                    active={false}
+                                    showLabel={navOpen}
+                                    tooltip="Settings"
+                                />
+                            </div>
+                        </aside>
+
+                        {/* Left Nav Toggle Button */}
+                        {/* Left Nav Toggle Button */}
+                        <Button
+                            onClick={() => setNavOpen(!navOpen)}
+                            size="icon"
+                            variant="outline"
+                            className="absolute right-0 top-1/2 translate-x-1/2 z-40 shadow-md bg-background rounded-lg"
+                            aria-label={navOpen ? "Collapse Navigation" : "Expand Navigation"}
+                        >
+                            {navOpen ? <Icons.ChevronLeft size={16} /> : <Icons.ChevronRight size={16} />}
+                        </Button>
+                    </div>
+                )}
 
                 {/* MAIN CONTENT AREA (Header + Content) */}
                 <div className="flex-1 flex flex-col h-full overflow-hidden">
@@ -259,7 +284,7 @@ const TradeVisionApp: React.FC = () => {
                         {/* Right Actions */}
                         <div className="flex items-center gap-4">
                             {/* Notification Bell (Added per image suggestion, reusing Bell icon) */}
-                            <NotificationInboxPopover />
+                            {user && <NotificationInboxPopover />}
 
                             <Button
                                 size="icon"
@@ -273,16 +298,33 @@ const TradeVisionApp: React.FC = () => {
 
                             <div className="h-6 w-[1px] bg-[#e0e3eb] dark:bg-[#2a2e39]" />
 
-                            {user && (
-                                <Button variant="outline" className="gap-2 px-2 h-9 border-input"
-                                    onClick={() => { /* User menu or nothing for now */ }}
+                            {user ? (
+                                <DropdownMenu>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="outline" className="gap-2 px-2 h-9 border-input"
+                                            onClick={() => { /* User menu handled by dropdown */ }}
+                                        >
+                                            <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-[10px] shadow-sm">
+                                                {user.email?.[0].toUpperCase()}
+                                            </div>
+                                            <span className="text-xs font-bold text-[#131722] dark:text-[#d1d4dc] hidden sm:block">
+                                                John Marker Ui
+                                            </span>
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent align="end">
+                                        <DropdownMenuItem onClick={() => signOut()}>
+                                            Log out
+                                        </DropdownMenuItem>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            ) : (
+                                <Button
+                                    variant="outline"
+                                    className="h-9 px-4 border-input font-bold text-xs"
+                                    onClick={() => navigate('/auth')}
                                 >
-                                    <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-[10px] shadow-sm">
-                                        {user.email?.[0].toUpperCase()}
-                                    </div>
-                                    <span className="text-xs font-bold text-[#131722] dark:text-[#d1d4dc] hidden sm:block">
-                                        John Marker Ui
-                                    </span>
+                                    Login
                                 </Button>
                             )}
                         </div>
@@ -307,53 +349,55 @@ const TradeVisionApp: React.FC = () => {
                         </main>
 
                         {/* RIGHT SIDEBAR (Watchlist) - Toggleable */}
-                        <div className={`relative flex h-full transition-all duration-300 ${rightPanelOpen ? 'w-[300px]' : 'w-0'}`}>
+                        {user && (
+                            <div className={`relative flex h-full transition-all duration-300 ${rightPanelOpen ? 'w-[300px]' : 'w-0'}`}>
 
-                            {/* Toggle Button */}
-                            {/* Toggle Button */}
-                            <button
-                                onClick={() => setRightPanelOpen(!rightPanelOpen)}
-                                className="absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 bg-white dark:bg-[#1e222d] border border-r-0 border-[#e0e3eb] dark:border-[#2a2e39] p-1 rounded-l-md shadow-md z-20 flex items-center justify-center h-12 w-6 hover:text-[#2962ff] transition-colors"
-                                title={rightPanelOpen ? "Collapse Sidebar" : "Expand Sidebar"}
-                            >
-                                {rightPanelOpen ? <Icons.ChevronRight className="w-4 h-4" /> : <Icons.ChevronLeft className="w-4 h-4" />}
-                            </button>
+                                {/* Toggle Button */}
+                                {/* Toggle Button */}
+                                <button
+                                    onClick={() => setRightPanelOpen(!rightPanelOpen)}
+                                    className="absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 bg-white dark:bg-[#1e222d] border border-r-0 border-[#e0e3eb] dark:border-[#2a2e39] p-1 rounded-l-md shadow-md z-20 flex items-center justify-center h-12 w-6 hover:text-[#2962ff] transition-colors"
+                                    title={rightPanelOpen ? "Collapse Sidebar" : "Expand Sidebar"}
+                                >
+                                    {rightPanelOpen ? <Icons.ChevronRight className="w-4 h-4" /> : <Icons.ChevronLeft className="w-4 h-4" />}
+                                </button>
 
-                            <aside className={`w-[300px] flex flex-col border-l border-[#e0e3eb] dark:border-[#2a2e39] bg-white dark:bg-[#131722] z-10 shrink-0 shadow-xl lg:shadow-none h-full overflow-hidden ${!rightPanelOpen && 'hidden'}`}>
-                                {/* Watchlist Header */}
-                                <div className="h-[48px] min-h-[48px] flex items-center justify-between px-3 border-b border-[#e0e3eb] dark:border-[#2a2e39] bg-[#f8f9fd] dark:bg-[#1e222d] whitespace-nowrap">
-                                    <div className="flex items-center gap-2 cursor-pointer">
-                                        <span className="text-sm font-bold uppercase tracking-wider text-[#131722] dark:text-[#d1d4dc]">Watchlist</span>
-                                        <Icons.ChevronDown className="w-3 h-3 text-[#787b86]" />
-                                    </div>
-                                    <div className="flex gap-1">
-                                        <button onClick={() => setRightPanelOpen(false)} className="lg:hidden p-1">
-                                            <Icons.X className="w-4 h-4 text-[#787b86]" />
-                                        </button>
-                                        <Icons.Plus className="w-4 h-4 text-[#787b86] cursor-pointer hover:text-[#2962ff]" />
-                                        <Icons.More className="w-4 h-4 text-[#787b86] cursor-pointer hover:text-[#2962ff]" />
-                                    </div>
-                                </div>
-
-                                {/* Watchlist Items */}
-                                <div className="flex-1 overflow-y-auto bg-white dark:bg-[#131722]">
-                                    {MOCK_STOCKS.map(stock => (
-                                        <div key={stock.symbol} className="px-3 py-3 hover:bg-[#f0f3fa] dark:hover:bg-[#2a2e39] cursor-pointer group border-b border-[#e0e3eb] dark:border-[#2a2e39] last:border-0 border-opacity-50">
-                                            <div className="flex justify-between items-center mb-0.5">
-                                                <span className="text-sm font-bold text-[#131722] dark:text-[#d1d4dc]">{stock.symbol}</span>
-                                                <span className="text-sm font-medium text-[#131722] dark:text-[#d1d4dc]">{stock.price.toFixed(2)}</span>
-                                            </div>
-                                            <div className="flex justify-between items-center">
-                                                <span className="text-xs text-[#787b86] truncate max-w-[120px]">{stock.name}</span>
-                                                <span className={`text-xs font-medium ${stock.change >= 0 ? 'text-[#00bfa5]' : 'text-[#f23645]'}`}>
-                                                    {stock.change > 0 ? '+' : ''}{stock.changePercent}%
-                                                </span>
-                                            </div>
+                                <aside className={`w-[300px] flex flex-col border-l border-[#e0e3eb] dark:border-[#2a2e39] bg-white dark:bg-[#131722] z-10 shrink-0 shadow-xl lg:shadow-none h-full overflow-hidden ${!rightPanelOpen && 'hidden'}`}>
+                                    {/* Watchlist Header */}
+                                    <div className="h-[48px] min-h-[48px] flex items-center justify-between px-3 border-b border-[#e0e3eb] dark:border-[#2a2e39] bg-[#f8f9fd] dark:bg-[#1e222d] whitespace-nowrap">
+                                        <div className="flex items-center gap-2 cursor-pointer">
+                                            <span className="text-sm font-bold uppercase tracking-wider text-[#131722] dark:text-[#d1d4dc]">Watchlist</span>
+                                            <Icons.ChevronDown className="w-3 h-3 text-[#787b86]" />
                                         </div>
-                                    ))}
-                                </div>
-                            </aside>
-                        </div>
+                                        <div className="flex gap-1">
+                                            <button onClick={() => setRightPanelOpen(false)} className="lg:hidden p-1">
+                                                <Icons.X className="w-4 h-4 text-[#787b86]" />
+                                            </button>
+                                            <Icons.Plus className="w-4 h-4 text-[#787b86] cursor-pointer hover:text-[#2962ff]" />
+                                            <Icons.More className="w-4 h-4 text-[#787b86] cursor-pointer hover:text-[#2962ff]" />
+                                        </div>
+                                    </div>
+
+                                    {/* Watchlist Items */}
+                                    <div className="flex-1 overflow-y-auto bg-white dark:bg-[#131722]">
+                                        {MOCK_STOCKS.map(stock => (
+                                            <div key={stock.symbol} className="px-3 py-3 hover:bg-[#f0f3fa] dark:hover:bg-[#2a2e39] cursor-pointer group border-b border-[#e0e3eb] dark:border-[#2a2e39] last:border-0 border-opacity-50">
+                                                <div className="flex justify-between items-center mb-0.5">
+                                                    <span className="text-sm font-bold text-[#131722] dark:text-[#d1d4dc]">{stock.symbol}</span>
+                                                    <span className="text-sm font-medium text-[#131722] dark:text-[#d1d4dc]">{stock.price.toFixed(2)}</span>
+                                                </div>
+                                                <div className="flex justify-between items-center">
+                                                    <span className="text-xs text-[#787b86] truncate max-w-[120px]">{stock.name}</span>
+                                                    <span className={`text-xs font-medium ${stock.change >= 0 ? 'text-[#00bfa5]' : 'text-[#f23645]'}`}>
+                                                        {stock.change > 0 ? '+' : ''}{stock.changePercent}%
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </aside>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

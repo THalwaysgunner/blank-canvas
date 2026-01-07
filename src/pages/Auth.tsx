@@ -7,31 +7,13 @@ import { z } from 'zod';
 const emailSchema = z.string().email('Invalid email address');
 const passwordSchema = z.string().min(6, 'Password must be at least 6 characters');
 
-const Auth: React.FC = () => {
+export const AuthForm: React.FC<{ onSuccess?: () => void }> = ({ onSuccess }) => {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-
-  // Check if user is already logged in
-  useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
-      if (session?.user) {
-        navigate('/');
-      }
-    });
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) {
-        navigate('/');
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
 
   const validateInputs = () => {
     try {
@@ -72,6 +54,8 @@ const Auth: React.FC = () => {
           } else {
             setError(error.message);
           }
+        } else {
+          onSuccess?.();
         }
       } else {
         const { error } = await supabase.auth.signUp({
@@ -91,6 +75,8 @@ const Auth: React.FC = () => {
           } else {
             setError(error.message);
           }
+        } else {
+          onSuccess?.();
         }
       }
     } catch (err) {
@@ -99,6 +85,115 @@ const Auth: React.FC = () => {
       setLoading(false);
     }
   };
+
+  return (
+    <div className="bg-white dark:bg-[#1e222d] rounded-xl border border-[#e0e3eb] dark:border-[#2a2e39] shadow-lg p-8 w-full max-w-md mx-auto">
+      <h2 className="text-2xl font-bold text-[#131722] dark:text-[#e0e3eb] mb-2 text-center">
+        {isLogin ? 'Welcome back' : 'Create account'}
+      </h2>
+      <p className="text-[#787b86] text-sm text-center mb-6">
+        {isLogin ? 'Sign in to access your account' : 'Sign up to get started'}
+      </p>
+
+      {error && (
+        <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm p-3 rounded-lg mb-4">
+          {error}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-4">
+        {!isLogin && (
+          <div>
+            <label className="block text-sm font-medium text-[#131722] dark:text-[#d1d4dc] mb-1">
+              Display Name
+            </label>
+            <input
+              type="text"
+              value={displayName}
+              onChange={(e) => setDisplayName(e.target.value)}
+              className="w-full bg-[#f0f3fa] dark:bg-[#131722] border border-[#e0e3eb] dark:border-[#2a2e39] rounded-lg px-4 py-2.5 text-[#131722] dark:text-[#d1d4dc] focus:outline-none focus:border-[#2962ff] transition-colors"
+              placeholder="John Doe"
+            />
+          </div>
+        )}
+
+        <div>
+          <label className="block text-sm font-medium text-[#131722] dark:text-[#d1d4dc] mb-1">
+            Email
+          </label>
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            className="w-full bg-[#f0f3fa] dark:bg-[#131722] border border-[#e0e3eb] dark:border-[#2a2e39] rounded-lg px-4 py-2.5 text-[#131722] dark:text-[#d1d4dc] focus:outline-none focus:border-[#2962ff] transition-colors"
+            placeholder="you@example.com"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-[#131722] dark:text-[#d1d4dc] mb-1">
+            Password
+          </label>
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
+            className="w-full bg-[#f0f3fa] dark:bg-[#131722] border border-[#e0e3eb] dark:border-[#2a2e39] rounded-lg px-4 py-2.5 text-[#131722] dark:text-[#d1d4dc] focus:outline-none focus:border-[#2962ff] transition-colors"
+            placeholder="••••••••"
+          />
+        </div>
+
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-[#2962ff] text-white font-semibold py-3 rounded-lg hover:bg-[#1e53e5] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+        >
+          {loading ? (
+            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+          ) : (
+            <>
+              {isLogin ? 'Sign In' : 'Create Account'}
+            </>
+          )}
+        </button>
+      </form>
+
+      <div className="mt-6 text-center">
+        <button
+          onClick={() => {
+            setIsLogin(!isLogin);
+            setError(null);
+          }}
+          className="text-sm text-[#2962ff] hover:underline"
+        >
+          {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+const Auth: React.FC = () => {
+  const navigate = useNavigate();
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        navigate('/');
+      }
+    });
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        navigate('/');
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#f8f9fd] dark:bg-[#131722] p-4">
@@ -115,91 +210,7 @@ const Auth: React.FC = () => {
         </div>
 
         {/* Auth Card */}
-        <div className="bg-white dark:bg-[#1e222d] rounded-xl border border-[#e0e3eb] dark:border-[#2a2e39] shadow-lg p-8">
-          <h2 className="text-2xl font-bold text-[#131722] dark:text-[#e0e3eb] mb-2 text-center">
-            {isLogin ? 'Welcome back' : 'Create account'}
-          </h2>
-          <p className="text-[#787b86] text-sm text-center mb-6">
-            {isLogin ? 'Sign in to access your account' : 'Sign up to get started'}
-          </p>
-
-          {error && (
-            <div className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 text-sm p-3 rounded-lg mb-4">
-              {error}
-            </div>
-          )}
-
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {!isLogin && (
-              <div>
-                <label className="block text-sm font-medium text-[#131722] dark:text-[#d1d4dc] mb-1">
-                  Display Name
-                </label>
-                <input
-                  type="text"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  className="w-full bg-[#f0f3fa] dark:bg-[#131722] border border-[#e0e3eb] dark:border-[#2a2e39] rounded-lg px-4 py-2.5 text-[#131722] dark:text-[#d1d4dc] focus:outline-none focus:border-[#2962ff] transition-colors"
-                  placeholder="John Doe"
-                />
-              </div>
-            )}
-
-            <div>
-              <label className="block text-sm font-medium text-[#131722] dark:text-[#d1d4dc] mb-1">
-                Email
-              </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="w-full bg-[#f0f3fa] dark:bg-[#131722] border border-[#e0e3eb] dark:border-[#2a2e39] rounded-lg px-4 py-2.5 text-[#131722] dark:text-[#d1d4dc] focus:outline-none focus:border-[#2962ff] transition-colors"
-                placeholder="you@example.com"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-[#131722] dark:text-[#d1d4dc] mb-1">
-                Password
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                className="w-full bg-[#f0f3fa] dark:bg-[#131722] border border-[#e0e3eb] dark:border-[#2a2e39] rounded-lg px-4 py-2.5 text-[#131722] dark:text-[#d1d4dc] focus:outline-none focus:border-[#2962ff] transition-colors"
-                placeholder="••••••••"
-              />
-            </div>
-
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-[#2962ff] text-white font-semibold py-3 rounded-lg hover:bg-[#1e53e5] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <>
-                  {isLogin ? 'Sign In' : 'Create Account'}
-                </>
-              )}
-            </button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <button
-              onClick={() => {
-                setIsLogin(!isLogin);
-                setError(null);
-              }}
-              className="text-sm text-[#2962ff] hover:underline"
-            >
-              {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
-            </button>
-          </div>
-        </div>
+        <AuthForm />
       </div>
     </div>
   );

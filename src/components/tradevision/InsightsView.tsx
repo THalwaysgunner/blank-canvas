@@ -72,7 +72,7 @@ const InsightsView: React.FC = () => {
                 {/* Sidebar Summary */}
                 <div className="col-span-12 lg:col-span-4 space-y-6">
                     {/* Recommendation Card */}
-                    <div className="bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] rounded-lg p-6 shadow-sm">
+                    <div className="bg-white dark:bg-[#1e222d] rounded-lg p-6 shadow-sm">
                         <div className="text-xs text-[#787b86] font-bold uppercase tracking-wider mb-4">Analyst Rating</div>
 
                         <div className="flex items-center justify-between mb-6">

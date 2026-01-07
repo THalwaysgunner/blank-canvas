@@ -36,7 +36,7 @@ const MarketsView: React.FC<MarketsViewProps> = ({ onStockClick }) => {
             </div>
 
             {/* Stock Table */}
-            <div className="bg-white dark:bg-[#1e222d] rounded-xl shadow-sm border border-[#e0e3eb] dark:border-[#2a2e39] overflow-hidden">
+            <div className="bg-white dark:bg-[#1e222d] rounded-xl shadow-sm overflow-hidden">
                 <div className="overflow-x-auto">
                     <table className="w-full">
                         <thead>

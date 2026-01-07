@@ -10,6 +10,9 @@ import MarketsView from './MarketsView';
 import MarketDetailView from './MarketDetailView';
 import { useAuth } from '@/contexts/AuthContext';
 import StockSearch from './StockSearch';
+import { NotificationInboxPopover } from "@/components/ui/notification-inbox-popover";
+import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 const TradeVisionApp: React.FC = () => {
     const { user, loading, signOut } = useAuth();
@@ -62,317 +65,327 @@ const TradeVisionApp: React.FC = () => {
     }
 
     return (
-        <div className="flex h-screen w-full bg-[#ffffff] dark:bg-[#131722] text-[#131722] dark:text-[#d1d4dc] overflow-hidden font-sans transition-colors duration-200">
+        <TooltipProvider>
+            <div className="flex h-screen w-full bg-[#ffffff] dark:bg-[#131722] text-[#131722] dark:text-[#d1d4dc] overflow-hidden font-sans transition-colors duration-200">
 
-            {/* LEFT TOOLBAR (Navigation) - Toggleable & Full Height */}
-            <div className={`relative flex flex-col bg-white dark:bg-[#131722] border-r border-[#e0e3eb] dark:border-[#2a2e39] transition-all duration-300 z-30 ${navOpen ? 'w-[240px]' : 'w-[60px]'}`}>
+                {/* LEFT TOOLBAR (Navigation) - Toggleable & Full Height */}
+                <div className={`relative flex flex-col bg-white dark:bg-[#131722] border-r border-[#e0e3eb] dark:border-[#2a2e39] transition-all duration-300 z-30 ${navOpen ? 'w-[240px]' : 'w-[60px]'}`}>
 
-                {/* Logo Section inside Sidebar */}
-                <div className="h-[60px] min-h-[60px] flex items-center px-4 mb-2">
-                    <div
-                        className="flex items-center gap-2 cursor-pointer group"
-                        onClick={() => setActiveView('home')}
-                    >
-                        <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[#2962ff] font-bold text-lg shadow-sm group-hover:bg-[#f0f3fa] dark:group-hover:bg-[#2a2e39] transition-colors">
-                            {/* Using simple orange diamond-like shape or icon from reference, keeping existing icon but styling it */}
-                            <Icons.TrendingUp className="w-6 h-6" />
-                        </div>
-                        <div className={`flex flex-col overflow-hidden transition-opacity duration-300 ${navOpen ? 'opacity-100' : 'opacity-0 w-0'}`}>
-                            <span className="font-bold tracking-tight text-lg leading-none text-[#131722] dark:text-[#e0e3eb] whitespace-nowrap">Headername</span>
-                        </div>
-                    </div>
-                </div>
-
-                <aside className="flex-1 flex flex-col items-center py-2 overflow-y-auto overflow-x-hidden custom-scrollbar">
-                    <div className="w-full px-3 flex flex-col gap-1">
-                        <ToolbarButton
-                            icon={Icons.Dashboard}
-                            label="Home"
-                            active={activeView === 'home'}
+                    {/* Logo Section inside Sidebar */}
+                    <div className="h-[60px] min-h-[60px] flex items-center px-4 mb-2">
+                        <div
+                            className="flex items-center gap-2 cursor-pointer group"
                             onClick={() => setActiveView('home')}
-                            showLabel={navOpen}
-                            tooltip="Home"
-                        />
-                        <ToolbarButton
-                            icon={Icons.Markets}
-                            label="Markets"
-                            active={activeView === 'markets'}
-                            onClick={() => setActiveView('markets')}
-                            showLabel={navOpen}
-                            tooltip="Markets"
-                        />
-                        <ToolbarButton
-                            icon={Icons.AI}
-                            label="My Portfolio"
-                            active={activeView === 'research'}
-                            onClick={() => setActiveView('research')}
-                            showLabel={navOpen}
-                            tooltip="My Portfolio"
-                        />
-                        <ToolbarButton
-                            icon={Icons.FolderSearch}
-                            label="My Researches"
-                            active={activeView === 'my-researches'}
-                            onClick={() => setActiveView('my-researches')}
-                            showLabel={navOpen}
-                            tooltip="My Researches"
-                        />
-                    </div>
-
-                    <div className="w-full px-3 my-2">
-                        <div className="h-[1px] bg-[#e0e3eb] dark:bg-[#2a2e39]" />
-                    </div>
-
-                    <div className="w-full px-3 flex flex-col gap-1">
-                        <ToolbarButton
-                            icon={Icons.List}
-                            label="Watchlist"
-                            active={rightPanelOpen}
-                            onClick={() => setRightPanelOpen(!rightPanelOpen)}
-                            showLabel={navOpen}
-                            tooltip="Watchlist"
-                        />
-
-                        {/* Educational Section */}
-                        {navOpen ? (
-                            <>
-                                <div className="mt-4 mb-2 px-3 transition-opacity duration-300">
-                                    <span className="text-xs font-semibold text-[#b2b5be] uppercase tracking-wider">Educational</span>
-                                </div>
-                                <div className="flex flex-col gap-1 pl-3">
-                                    <ToolbarButton
-                                        label="Knowledge Base"
-                                        active={false}
-                                        showLabel={true}
-                                        tooltip="Knowledge Base"
-                                    />
-                                    <ToolbarButton
-                                        label="Watchlist Management"
-                                        active={false}
-                                        showLabel={true}
-                                        tooltip="Watchlist Management"
-                                    />
-                                    <ToolbarButton
-                                        label="The Formula"
-                                        active={false}
-                                        showLabel={true}
-                                        tooltip="The Formula"
-                                    />
-                                    <ToolbarButton
-                                        label="Podcasts"
-                                        active={false}
-                                        showLabel={true}
-                                        tooltip="Podcasts"
-                                    />
-                                </div>
-                            </>
-                        ) : (
-                            <div className="mt-2">
-                                <ToolbarButton
-                                    icon={Icons.Education}
-                                    label="Educational"
-                                    active={false}
-                                    onClick={() => setNavOpen(true)}
-                                    showLabel={false}
-                                    tooltip="Educational"
-                                />
-                            </div>
-                        )}
-
-                        {/* Management Section */}
-                        {navOpen ? (
-                            <>
-                                <div className="mt-4 mb-2 px-3 transition-opacity duration-300">
-                                    <span className="text-xs font-semibold text-[#b2b5be] uppercase tracking-wider">Management</span>
-                                </div>
-                                <div className="flex flex-col gap-1 pl-3">
-                                    <ToolbarButton
-                                        label="My Notes"
-                                        active={false}
-                                        showLabel={true}
-                                        tooltip="My Notes"
-                                    />
-                                    <ToolbarButton
-                                        label="Simulations"
-                                        active={false}
-                                        showLabel={true}
-                                        tooltip="Simulations"
-                                    />
-                                </div>
-                            </>
-                        ) : (
-                            <div className="mt-2">
-                                <ToolbarButton
-                                    icon={Icons.Management}
-                                    label="Management"
-                                    active={false}
-                                    onClick={() => setNavOpen(true)}
-                                    showLabel={false}
-                                    tooltip="Management"
-                                />
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="mt-auto w-full px-3 flex flex-col gap-2 mb-4">
-                        <ToolbarButton
-                            icon={Icons.Settings}
-                            label="Settings"
-                            active={false}
-                            showLabel={navOpen}
-                            tooltip="Settings"
-                        />
-                    </div>
-                </aside>
-
-                {/* Left Nav Toggle Button */}
-                <button
-                    onClick={() => setNavOpen(!navOpen)}
-                    className="absolute right-0 top-1/2 translate-x-1/2 bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] p-1 rounded-full shadow-md z-40 flex items-center justify-center h-6 w-6 hover:text-[#2962ff] transition-colors"
-                    title={navOpen ? "Collapse Navigation" : "Expand Navigation"}
-                >
-                    {navOpen ? <Icons.ChevronLeft className="w-3 h-3" /> : <Icons.ChevronRight className="w-3 h-3" />}
-                </button>
-            </div>
-
-            {/* MAIN CONTENT AREA (Header + Content) */}
-            <div className="flex-1 flex flex-col h-full overflow-hidden">
-
-                {/* TOP HEADER - Now inside main content area */}
-                <header className="h-[60px] min-h-[60px] flex items-center justify-between px-6 border-b border-[#e0e3eb] dark:border-[#2a2e39] bg-white dark:bg-[#131722] z-20">
-
-                    {/* Search Bar - Taking prominent space */}
-                    <div className="flex-1 max-w-xl">
-                        <StockSearch
-                            className="w-full"
-                            onSelect={(stock) => console.log('Selected:', stock)}
-                        />
-                    </div>
-
-                    {/* Right Actions */}
-                    <div className="flex items-center gap-4">
-                        {/* Notification Bell (Added per image suggestion, reusing Bell icon) */}
-                        <button className="p-2 text-[#787b86] hover:bg-[#f0f3fa] dark:hover:bg-[#2a2e39] rounded-full transition-colors relative">
-                            <Icons.Bell className="w-5 h-5" />
-                            <div className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-[#131722]"></div>
-                        </button>
-
-                        <button
-                            onClick={toggleTheme}
-                            className="p-2 text-[#787b86] hover:bg-[#f0f3fa] dark:hover:bg-[#2a2e39] rounded-full transition-colors"
-                            title={`Switch to ${theme === Theme.DARK ? 'Light' : 'Dark'} Mode`}
                         >
-                            {theme === Theme.DARK ? <Icons.Sun className="w-5 h-5" /> : <Icons.Moon className="w-5 h-5" />}
-                        </button>
-
-                        <div className="h-6 w-[1px] bg-[#e0e3eb] dark:bg-[#2a2e39]" />
-
-                        {user && (
-                            <div className="flex items-center gap-3 pl-2">
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold shadow-sm">
-                                    {user.email?.[0].toUpperCase()}
-                                </div>
-                                <span className="text-sm font-bold text-[#131722] dark:text-[#d1d4dc] hidden sm:block">
-                                    John Marker Ui
-                                </span>
+                            <div className="w-8 h-8 rounded-lg flex items-center justify-center text-[#2962ff] font-bold text-lg shadow-sm group-hover:bg-[#f0f3fa] dark:group-hover:bg-[#2a2e39] transition-colors">
+                                {/* Using simple orange diamond-like shape or icon from reference, keeping existing icon but styling it */}
+                                <Icons.TrendingUp className="w-6 h-6" />
                             </div>
-                        )}
+                            <div className={`flex flex-col overflow-hidden transition-opacity duration-300 ${navOpen ? 'opacity-100' : 'opacity-0 w-0'}`}>
+                                <span className="font-bold tracking-tight text-lg leading-none text-[#131722] dark:text-[#e0e3eb] whitespace-nowrap">Headername</span>
+                            </div>
+                        </div>
                     </div>
-                </header>
 
-                {/* CANVAS CONTENT */}
-                <div className="flex-1 flex overflow-hidden relative">
-                    <main className="flex-1 bg-[#ffffff] dark:bg-[#131722] relative overflow-hidden flex flex-col">
-                        {activeView === 'home' && <HomeView />}
-                        {activeView === 'research' && <ResearchSection />}
-                        {activeView === 'markets' && (
-                            !selectedMarketStock
-                                ? <MarketsView onStockClick={setSelectedMarketStock} />
-                                : <MarketDetailView
-                                    symbol={selectedMarketStock}
-                                    onBack={() => setSelectedMarketStock(null)}
-                                    onResearch={handleMarketResearch}
-                                />
-                        )}
-                        {activeView === 'dashboard' && <MarketOverviewMode />}
-                        {activeView === 'my-researches' && <MyResearchesView initialSymbol={researchTargetSymbol} />}
-                    </main>
+                    <aside className="flex-1 flex flex-col items-center py-2 overflow-y-auto overflow-x-hidden custom-scrollbar">
+                        <div className="w-full px-3 flex flex-col gap-1">
+                            <ToolbarButton
+                                icon={Icons.Dashboard}
+                                label="Home"
+                                active={activeView === 'home'}
+                                onClick={() => setActiveView('home')}
+                                showLabel={navOpen}
+                                tooltip="Home"
+                            />
+                            <ToolbarButton
+                                icon={Icons.Markets}
+                                label="Markets"
+                                active={activeView === 'markets'}
+                                onClick={() => setActiveView('markets')}
+                                showLabel={navOpen}
+                                tooltip="Markets"
+                            />
+                            <ToolbarButton
+                                icon={Icons.AI}
+                                label="My Portfolio"
+                                active={activeView === 'research'}
+                                onClick={() => setActiveView('research')}
+                                showLabel={navOpen}
+                                tooltip="My Portfolio"
+                            />
+                            <ToolbarButton
+                                icon={Icons.FolderSearch}
+                                label="My Researches"
+                                active={activeView === 'my-researches'}
+                                onClick={() => setActiveView('my-researches')}
+                                showLabel={navOpen}
+                                tooltip="My Researches"
+                            />
+                        </div>
 
-                    {/* RIGHT SIDEBAR (Watchlist) - Toggleable */}
-                    <div className={`relative flex h-full transition-all duration-300 ${rightPanelOpen ? 'w-[300px]' : 'w-0'}`}>
+                        <div className="w-full px-3 my-2">
+                            <div className="h-[1px] bg-[#e0e3eb] dark:bg-[#2a2e39]" />
+                        </div>
 
-                        {/* Toggle Button */}
-                        <button
-                            onClick={() => setRightPanelOpen(!rightPanelOpen)}
-                            className="absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 bg-white dark:bg-[#1e222d] border border-r-0 border-[#e0e3eb] dark:border-[#2a2e39] p-1 rounded-l-md shadow-md z-20 flex items-center justify-center h-12 w-6 hover:text-[#2962ff] transition-colors"
-                            title={rightPanelOpen ? "Collapse Sidebar" : "Expand Sidebar"}
-                        >
-                            {rightPanelOpen ? <Icons.ChevronRight className="w-4 h-4" /> : <Icons.ChevronLeft className="w-4 h-4" />}
-                        </button>
+                        <div className="w-full px-3 flex flex-col gap-1">
+                            <ToolbarButton
+                                icon={Icons.List}
+                                label="Watchlist"
+                                active={rightPanelOpen}
+                                onClick={() => setRightPanelOpen(!rightPanelOpen)}
+                                showLabel={navOpen}
+                                tooltip="Watchlist"
+                            />
 
-                        <aside className={`w-[300px] flex flex-col border-l border-[#e0e3eb] dark:border-[#2a2e39] bg-white dark:bg-[#131722] z-10 shrink-0 shadow-xl lg:shadow-none h-full overflow-hidden ${!rightPanelOpen && 'hidden'}`}>
-                            {/* Watchlist Header */}
-                            <div className="h-[48px] min-h-[48px] flex items-center justify-between px-3 border-b border-[#e0e3eb] dark:border-[#2a2e39] bg-[#f8f9fd] dark:bg-[#1e222d] whitespace-nowrap">
-                                <div className="flex items-center gap-2 cursor-pointer">
-                                    <span className="text-sm font-bold uppercase tracking-wider text-[#131722] dark:text-[#d1d4dc]">Watchlist</span>
-                                    <Icons.ChevronDown className="w-3 h-3 text-[#787b86]" />
-                                </div>
-                                <div className="flex gap-1">
-                                    <button onClick={() => setRightPanelOpen(false)} className="lg:hidden p-1">
-                                        <Icons.X className="w-4 h-4 text-[#787b86]" />
-                                    </button>
-                                    <Icons.Plus className="w-4 h-4 text-[#787b86] cursor-pointer hover:text-[#2962ff]" />
-                                    <Icons.More className="w-4 h-4 text-[#787b86] cursor-pointer hover:text-[#2962ff]" />
-                                </div>
-                            </div>
-
-                            {/* Watchlist Items */}
-                            <div className="flex-1 overflow-y-auto bg-white dark:bg-[#131722]">
-                                {MOCK_STOCKS.map(stock => (
-                                    <div key={stock.symbol} className="px-3 py-3 hover:bg-[#f0f3fa] dark:hover:bg-[#2a2e39] cursor-pointer group border-b border-[#e0e3eb] dark:border-[#2a2e39] last:border-0 border-opacity-50">
-                                        <div className="flex justify-between items-center mb-0.5">
-                                            <span className="text-sm font-bold text-[#131722] dark:text-[#d1d4dc]">{stock.symbol}</span>
-                                            <span className="text-sm font-medium text-[#131722] dark:text-[#d1d4dc]">{stock.price.toFixed(2)}</span>
-                                        </div>
-                                        <div className="flex justify-between items-center">
-                                            <span className="text-xs text-[#787b86] truncate max-w-[120px]">{stock.name}</span>
-                                            <span className={`text-xs font-medium ${stock.change >= 0 ? 'text-[#00bfa5]' : 'text-[#f23645]'}`}>
-                                                {stock.change > 0 ? '+' : ''}{stock.changePercent}%
-                                            </span>
-                                        </div>
+                            {/* Educational Section */}
+                            {navOpen ? (
+                                <>
+                                    <div className="mt-4 mb-2 px-3 transition-opacity duration-300">
+                                        <span className="text-xs font-semibold text-[#b2b5be] uppercase tracking-wider">Educational</span>
                                     </div>
-                                ))}
-                            </div>
-                        </aside>
+                                    <div className="flex flex-col gap-1 pl-3">
+                                        <ToolbarButton
+                                            label="Knowledge Base"
+                                            active={false}
+                                            showLabel={true}
+                                            tooltip="Knowledge Base"
+                                        />
+                                        <ToolbarButton
+                                            label="Watchlist Management"
+                                            active={false}
+                                            showLabel={true}
+                                            tooltip="Watchlist Management"
+                                        />
+                                        <ToolbarButton
+                                            label="The Formula"
+                                            active={false}
+                                            showLabel={true}
+                                            tooltip="The Formula"
+                                        />
+                                        <ToolbarButton
+                                            label="Podcasts"
+                                            active={false}
+                                            showLabel={true}
+                                            tooltip="Podcasts"
+                                        />
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="mt-2">
+                                    <ToolbarButton
+                                        icon={Icons.Education}
+                                        label="Educational"
+                                        active={false}
+                                        onClick={() => setNavOpen(true)}
+                                        showLabel={false}
+                                        tooltip="Educational"
+                                    />
+                                </div>
+                            )}
+
+                            {/* Management Section */}
+                            {navOpen ? (
+                                <>
+                                    <div className="mt-4 mb-2 px-3 transition-opacity duration-300">
+                                        <span className="text-xs font-semibold text-[#b2b5be] uppercase tracking-wider">Management</span>
+                                    </div>
+                                    <div className="flex flex-col gap-1 pl-3">
+                                        <ToolbarButton
+                                            label="My Notes"
+                                            active={false}
+                                            showLabel={true}
+                                            tooltip="My Notes"
+                                        />
+                                        <ToolbarButton
+                                            label="Simulations"
+                                            active={false}
+                                            showLabel={true}
+                                            tooltip="Simulations"
+                                        />
+                                    </div>
+                                </>
+                            ) : (
+                                <div className="mt-2">
+                                    <ToolbarButton
+                                        icon={Icons.Management}
+                                        label="Management"
+                                        active={false}
+                                        onClick={() => setNavOpen(true)}
+                                        showLabel={false}
+                                        tooltip="Management"
+                                    />
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="mt-auto w-full px-3 flex flex-col gap-2 mb-4">
+                            <ToolbarButton
+                                icon={Icons.Settings}
+                                label="Settings"
+                                active={false}
+                                showLabel={navOpen}
+                                tooltip="Settings"
+                            />
+                        </div>
+                    </aside>
+
+                    {/* Left Nav Toggle Button */}
+                    {/* Left Nav Toggle Button */}
+                    <Button
+                        onClick={() => setNavOpen(!navOpen)}
+                        size="icon"
+                        variant="outline"
+                        className="absolute right-0 top-1/2 translate-x-1/2 z-40 shadow-md bg-background rounded-lg"
+                        aria-label={navOpen ? "Collapse Navigation" : "Expand Navigation"}
+                    >
+                        {navOpen ? <Icons.ChevronLeft size={16} /> : <Icons.ChevronRight size={16} />}
+                    </Button>
+                </div>
+
+                {/* MAIN CONTENT AREA (Header + Content) */}
+                <div className="flex-1 flex flex-col h-full overflow-hidden">
+
+                    {/* TOP HEADER - Now inside main content area */}
+                    <header className="h-[60px] min-h-[60px] flex items-center justify-between px-6 border-b border-[#e0e3eb] dark:border-[#2a2e39] bg-white dark:bg-[#131722] z-20">
+
+                        {/* Search Bar - Taking prominent space */}
+                        <div className="flex-1 max-w-xl">
+                            <StockSearch
+                                className="w-full"
+                                onSelect={(stock) => console.log('Selected:', stock)}
+                            />
+                        </div>
+
+                        {/* Right Actions */}
+                        <div className="flex items-center gap-4">
+                            {/* Notification Bell (Added per image suggestion, reusing Bell icon) */}
+                            <NotificationInboxPopover />
+
+                            <Button
+                                size="icon"
+                                variant="outline"
+                                className="relative"
+                                onClick={toggleTheme}
+                                aria-label={`Switch to ${theme === Theme.DARK ? 'Light' : 'Dark'} Mode`}
+                            >
+                                {theme === Theme.DARK ? <Icons.Sun size={16} strokeWidth={2} /> : <Icons.Moon size={16} strokeWidth={2} />}
+                            </Button>
+
+                            <div className="h-6 w-[1px] bg-[#e0e3eb] dark:bg-[#2a2e39]" />
+
+                            {user && (
+                                <Button variant="outline" className="gap-2 px-2 h-9 border-input"
+                                    onClick={() => { /* User menu or nothing for now */ }}
+                                >
+                                    <div className="w-5 h-5 rounded-full bg-gradient-to-tr from-blue-500 to-cyan-500 flex items-center justify-center text-white font-bold text-[10px] shadow-sm">
+                                        {user.email?.[0].toUpperCase()}
+                                    </div>
+                                    <span className="text-xs font-bold text-[#131722] dark:text-[#d1d4dc] hidden sm:block">
+                                        John Marker Ui
+                                    </span>
+                                </Button>
+                            )}
+                        </div>
+                    </header>
+
+                    {/* CANVAS CONTENT */}
+                    <div className="flex-1 flex overflow-hidden relative">
+                        <main className="flex-1 bg-[#ffffff] dark:bg-[#131722] relative overflow-hidden flex flex-col">
+                            {activeView === 'home' && <HomeView />}
+                            {activeView === 'research' && <ResearchSection />}
+                            {activeView === 'markets' && (
+                                !selectedMarketStock
+                                    ? <MarketsView onStockClick={setSelectedMarketStock} />
+                                    : <MarketDetailView
+                                        symbol={selectedMarketStock}
+                                        onBack={() => setSelectedMarketStock(null)}
+                                        onResearch={handleMarketResearch}
+                                    />
+                            )}
+                            {activeView === 'dashboard' && <MarketOverviewMode />}
+                            {activeView === 'my-researches' && <MyResearchesView initialSymbol={researchTargetSymbol} />}
+                        </main>
+
+                        {/* RIGHT SIDEBAR (Watchlist) - Toggleable */}
+                        <div className={`relative flex h-full transition-all duration-300 ${rightPanelOpen ? 'w-[300px]' : 'w-0'}`}>
+
+                            {/* Toggle Button */}
+                            {/* Toggle Button */}
+                            <button
+                                onClick={() => setRightPanelOpen(!rightPanelOpen)}
+                                className="absolute left-0 top-1/2 -translate-x-full -translate-y-1/2 bg-white dark:bg-[#1e222d] border border-r-0 border-[#e0e3eb] dark:border-[#2a2e39] p-1 rounded-l-md shadow-md z-20 flex items-center justify-center h-12 w-6 hover:text-[#2962ff] transition-colors"
+                                title={rightPanelOpen ? "Collapse Sidebar" : "Expand Sidebar"}
+                            >
+                                {rightPanelOpen ? <Icons.ChevronRight className="w-4 h-4" /> : <Icons.ChevronLeft className="w-4 h-4" />}
+                            </button>
+
+                            <aside className={`w-[300px] flex flex-col border-l border-[#e0e3eb] dark:border-[#2a2e39] bg-white dark:bg-[#131722] z-10 shrink-0 shadow-xl lg:shadow-none h-full overflow-hidden ${!rightPanelOpen && 'hidden'}`}>
+                                {/* Watchlist Header */}
+                                <div className="h-[48px] min-h-[48px] flex items-center justify-between px-3 border-b border-[#e0e3eb] dark:border-[#2a2e39] bg-[#f8f9fd] dark:bg-[#1e222d] whitespace-nowrap">
+                                    <div className="flex items-center gap-2 cursor-pointer">
+                                        <span className="text-sm font-bold uppercase tracking-wider text-[#131722] dark:text-[#d1d4dc]">Watchlist</span>
+                                        <Icons.ChevronDown className="w-3 h-3 text-[#787b86]" />
+                                    </div>
+                                    <div className="flex gap-1">
+                                        <button onClick={() => setRightPanelOpen(false)} className="lg:hidden p-1">
+                                            <Icons.X className="w-4 h-4 text-[#787b86]" />
+                                        </button>
+                                        <Icons.Plus className="w-4 h-4 text-[#787b86] cursor-pointer hover:text-[#2962ff]" />
+                                        <Icons.More className="w-4 h-4 text-[#787b86] cursor-pointer hover:text-[#2962ff]" />
+                                    </div>
+                                </div>
+
+                                {/* Watchlist Items */}
+                                <div className="flex-1 overflow-y-auto bg-white dark:bg-[#131722]">
+                                    {MOCK_STOCKS.map(stock => (
+                                        <div key={stock.symbol} className="px-3 py-3 hover:bg-[#f0f3fa] dark:hover:bg-[#2a2e39] cursor-pointer group border-b border-[#e0e3eb] dark:border-[#2a2e39] last:border-0 border-opacity-50">
+                                            <div className="flex justify-between items-center mb-0.5">
+                                                <span className="text-sm font-bold text-[#131722] dark:text-[#d1d4dc]">{stock.symbol}</span>
+                                                <span className="text-sm font-medium text-[#131722] dark:text-[#d1d4dc]">{stock.price.toFixed(2)}</span>
+                                            </div>
+                                            <div className="flex justify-between items-center">
+                                                <span className="text-xs text-[#787b86] truncate max-w-[120px]">{stock.name}</span>
+                                                <span className={`text-xs font-medium ${stock.change >= 0 ? 'text-[#00bfa5]' : 'text-[#f23645]'}`}>
+                                                    {stock.change > 0 ? '+' : ''}{stock.changePercent}%
+                                                </span>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </aside>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </TooltipProvider>
     );
 };
 
 const ToolbarButton = ({ icon: Icon, active, onClick, tooltip, label, showLabel }: { icon?: any, active: boolean, onClick?: () => void, tooltip?: string, label?: string, showLabel?: boolean }) => (
-    <button
-        onClick={onClick}
-        className={`w-full h-10 flex items-center ${showLabel ? 'justify-start px-3' : 'justify-center'} rounded-xl transition-all relative group mb-2
-      ${active
-                ? 'text-[#2962ff] bg-[#2962ff]/10 dark:bg-[#2962ff]/20'
-                : 'text-[#787b86] hover:text-[#131722] dark:hover:text-[#d1d4dc] hover:bg-[#f0f3fa] dark:hover:bg-[#2a2e39]'}`}
-    >
-        {Icon && <Icon className="w-5 h-5 flex-shrink-0" strokeWidth={2} />}
+    <Tooltip delayDuration={0}>
+        <TooltipTrigger asChild>
+            <button
+                onClick={onClick}
+                className={`w-full h-10 flex items-center ${showLabel ? 'justify-start px-3' : 'justify-center'} rounded-xl transition-all relative group mb-2
+          ${active
+                        ? 'text-[#2962ff] bg-[#2962ff]/10 dark:bg-[#2962ff]/20'
+                        : 'text-[#787b86] hover:text-[#131722] dark:hover:text-[#d1d4dc] hover:bg-[#f0f3fa] dark:hover:bg-[#2a2e39]'}`}
+            >
+                {Icon && <Icon className="w-5 h-5 flex-shrink-0" strokeWidth={2} />}
 
-        {showLabel && (
-            <span className={`${Icon ? 'ml-3' : ''} text-sm font-medium whitespace-nowrap overflow-hidden transition-opacity duration-300 ${showLabel ? 'opacity-100' : 'opacity-0'}`}>
-                {label}
-            </span>
-        )}
-
+                {showLabel && (
+                    <span className={`${Icon ? 'ml-3' : ''} text-sm font-medium whitespace-nowrap overflow-hidden transition-opacity duration-300 ${showLabel ? 'opacity-100' : 'opacity-0'}`}>
+                        {label}
+                    </span>
+                )}
+            </button>
+        </TooltipTrigger>
         {tooltip && !showLabel && (
-            <div className="absolute left-14 bg-[#131722] text-white text-xs font-medium px-2 py-1.5 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 pointer-events-none shadow-md">
-                {tooltip}
-            </div>
+            <TooltipContent side="right" className="z-50 bg-[#131722] text-white border-[#2a2e39]">
+                <p>{tooltip}</p>
+            </TooltipContent>
         )}
-    </button>
+    </Tooltip>
 );
 
 // --- VIEWS ---
@@ -404,7 +417,7 @@ const HomeView = () => (
             {/* Major Indices Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 {MOCK_INDICES.slice(0, 4).map((idx) => (
-                    <div key={idx.name} className="bg-white dark:bg-[#1e222d] p-5 rounded-lg border border-[#e0e3eb] dark:border-[#2a2e39] shadow-sm hover:shadow-md transition-shadow cursor-pointer group">
+                    <div key={idx.name} className="bg-white dark:bg-[#1e222d] p-5 rounded-lg shadow-sm hover:shadow-md transition-shadow cursor-pointer group">
                         <div className="flex justify-between items-start mb-3">
                             <h3 className="font-bold text-lg text-[#131722] dark:text-[#e0e3eb] group-hover:text-[#2962ff] transition-colors">{idx.name}</h3>
                             <Icons.ArrowRight className="w-4 h-4 text-[#787b86] group-hover:translate-x-1 transition-transform" />
@@ -436,7 +449,7 @@ const HomeView = () => (
                             <button className="text-sm font-medium text-[#2962ff] hover:text-[#1e53e5]">View All News</button>
                         </div>
 
-                        <div className="bg-white dark:bg-[#1e222d] rounded-xl border border-[#e0e3eb] dark:border-[#2a2e39] overflow-hidden shadow-sm">
+                        <div className="bg-white dark:bg-[#1e222d] rounded-xl overflow-hidden shadow-sm">
                             {/* Featured Story */}
                             <div className="p-0 sm:p-6 grid grid-cols-1 sm:grid-cols-3 gap-6 border-b border-[#e0e3eb] dark:border-[#2a2e39] cursor-pointer hover:bg-[#f8f9fd] dark:hover:bg-[#2a2e39] transition-colors">
                                 <div className="sm:col-span-1 h-48 sm:h-auto bg-gray-200 dark:bg-[#2a2e39] rounded-lg overflow-hidden relative">
@@ -497,7 +510,7 @@ const HomeView = () => (
                                 Market Movers
                             </h2>
                         </div>
-                        <div className="bg-white dark:bg-[#1e222d] rounded-xl border border-[#e0e3eb] dark:border-[#2a2e39] overflow-hidden shadow-sm">
+                        <div className="bg-white dark:bg-[#1e222d] rounded-xl overflow-hidden shadow-sm">
                             <div className="overflow-x-auto">
                                 <table className="w-full text-sm text-left">
                                     <thead className="bg-[#f8f9fd] dark:bg-[#131722] text-[#787b86] font-medium border-b border-[#e0e3eb] dark:border-[#2a2e39]">
@@ -540,7 +553,7 @@ const HomeView = () => (
                 <div className="space-y-8">
 
                     {/* Economic Calendar Widget */}
-                    <div className="bg-white dark:bg-[#1e222d] rounded-xl border border-[#e0e3eb] dark:border-[#2a2e39] shadow-sm p-5">
+                    <div className="bg-white dark:bg-[#1e222d] rounded-xl shadow-sm p-5">
                         <h3 className="font-bold text-[#131722] dark:text-[#e0e3eb] mb-4 flex items-center gap-2">
                             <Icons.List className="w-5 h-5 text-[#2962ff]" />
                             Economic Calendar
@@ -577,7 +590,7 @@ const HomeView = () => (
                     </div>
 
                     {/* Market Sentiment Widget */}
-                    <div className="bg-white dark:bg-[#1e222d] rounded-xl border border-[#e0e3eb] dark:border-[#2a2e39] shadow-sm p-5">
+                    <div className="bg-white dark:bg-[#1e222d] rounded-xl shadow-sm p-5">
                         <h3 className="font-bold text-[#131722] dark:text-[#e0e3eb] mb-4">Market Sentiment</h3>
                         <div className="flex items-center justify-center mb-4 relative">
                             {/* Semi-circle Gauge Mock */}

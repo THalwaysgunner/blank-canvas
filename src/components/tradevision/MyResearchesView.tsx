@@ -317,7 +317,7 @@ const MyResearchesView: React.FC<MyResearchesViewProps> = ({ initialSymbol }) =>
   const renderTabContent = () => {
     if (!selectedStock) {
       return (
-        <div className="bg-white dark:bg-[#1e222d] rounded-xl border border-[#e0e3eb] dark:border-[#2a2e39] p-8 min-h-[300px] flex items-center justify-center">
+        <div className="bg-white dark:bg-[#1e222d] rounded-xl p-8 min-h-[300px] flex items-center justify-center">
           <div className="text-center">
             <Icons.FileText className="w-12 h-12 text-[#787b86] mx-auto mb-4" />
             <p className="text-sm text-[#787b86]">Select a stock to view details</p>
@@ -357,7 +357,7 @@ const MyResearchesView: React.FC<MyResearchesViewProps> = ({ initialSymbol }) =>
             {/* Main layout (chart + metrics + analyst cards) */}
             <div className="grid grid-cols-12 gap-4">
               {/* Chart */}
-              <div className="col-span-12 xl:col-span-7 bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] rounded-sm overflow-hidden">
+              <div className="col-span-12 xl:col-span-7 bg-white dark:bg-[#1e222d] rounded-sm overflow-hidden">
                 <div className="p-3 border-b border-[#e0e3eb] dark:border-[#2a2e39] flex items-center justify-between gap-2">
                   <div className="flex items-center gap-1 flex-wrap">
                     {['1D', '5D', '1M', '3M', 'YTD', '1Y', '5Y', 'Max'].map((t) => (
@@ -394,7 +394,7 @@ const MyResearchesView: React.FC<MyResearchesViewProps> = ({ initialSymbol }) =>
                       {quickCompare.map((s) => (
                         <div
                           key={s.symbol}
-                          className="flex items-center gap-2 bg-[#f8f9fd] dark:bg-[#131722] border border-[#e0e3eb] dark:border-[#2a2e39] px-2 py-1 rounded-sm"
+                          className="flex items-center gap-2 bg-[#f8f9fd] dark:bg-[#131722] px-2 py-1 rounded-sm"
                         >
                           <span className="text-xs font-bold text-[#131722] dark:text-[#d1d4dc]">{s.symbol}</span>
                           <span className="text-xs text-[#787b86]">{s.price.toFixed(2)}</span>
@@ -409,7 +409,7 @@ const MyResearchesView: React.FC<MyResearchesViewProps> = ({ initialSymbol }) =>
               </div>
 
               {/* Metrics */}
-              <div className="col-span-12 md:col-span-6 xl:col-span-3 bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] rounded-sm p-4">
+              <div className="col-span-12 md:col-span-6 xl:col-span-3 bg-white dark:bg-[#1e222d] rounded-sm p-4">
                 <RangeBar
                   low={metrics.dayRange.low}
                   high={metrics.dayRange.high}
@@ -445,19 +445,19 @@ const MyResearchesView: React.FC<MyResearchesViewProps> = ({ initialSymbol }) =>
 
               {/* Analyst/Investor cards */}
               <div className="col-span-12 md:col-span-6 xl:col-span-2 grid grid-cols-2 gap-2">
-                <div className="bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] p-3 rounded-sm">
+                <div className="bg-white dark:bg-[#1e222d] p-3 rounded-sm">
                   <div className="text-xs text-[#787b86] mb-1">Analyst</div>
                   <div className="text-sm font-bold text-[#00bfa5] truncate">{analystData.rating}</div>
                   <div className="text-xs text-[#787b86]">{analystData.count} analysts</div>
                 </div>
-                <div className="bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] p-3 rounded-sm">
+                <div className="bg-white dark:bg-[#1e222d] p-3 rounded-sm">
                   <div className="text-xs text-[#787b86] mb-1">Analyst</div>
                   <div className="text-xs text-[#787b86]">Target Price</div>
                   <div className="text-sm font-bold text-[#131722] dark:text-[#d1d4dc]">{analystData.targetPrice} <span className="text-[10px] text-[#787b86]">USD</span></div>
                   <div className="text-xs text-[#787b86]">{analystData.count} analysts</div>
                 </div>
 
-                <div className="bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] p-3 rounded-sm">
+                <div className="bg-white dark:bg-[#1e222d] p-3 rounded-sm">
                   <div className="text-xs text-[#787b86] mb-1">Earnings</div>
                   <div className="text-xs text-[#787b86]">EPS Forecast</div>
                   <div className={`text-sm font-bold ${analystData.forecast === 'Up' ? 'text-[#00bfa5]' : analystData.forecast === 'Down' ? 'text-[#f23645]' : 'text-[#787b86]'}`}>
@@ -465,20 +465,20 @@ const MyResearchesView: React.FC<MyResearchesViewProps> = ({ initialSymbol }) =>
                   </div>
                   <div className="text-xs text-[#787b86]">{analystData.nextQuarter}</div>
                 </div>
-                <div className="bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] p-3 rounded-sm">
+                <div className="bg-white dark:bg-[#1e222d] p-3 rounded-sm">
                   <div className="text-xs text-[#787b86] mb-1">Investor</div>
                   <div className="text-xs text-[#787b86]">Top Seller</div>
                   <div className="text-sm font-bold text-[#131722] dark:text-[#d1d4dc] truncate">{analystData.topSeller}</div>
                   <div className="text-xs text-[#f23645] truncate">{analystData.topSellerChange}</div>
                 </div>
 
-                <div className="bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] p-3 rounded-sm">
+                <div className="bg-white dark:bg-[#1e222d] p-3 rounded-sm">
                   <div className="text-xs text-[#787b86] mb-1">Financials</div>
                   <div className="text-xs text-[#787b86]">Valuation</div>
                   <div className="text-sm font-bold text-[#f59e0b]">High <span className="text-[10px] text-[#787b86]">P/S</span></div>
                   <div className="text-xs text-[#787b86]">7.40 x</div>
                 </div>
-                <div className="bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] p-3 rounded-sm">
+                <div className="bg-white dark:bg-[#1e222d] p-3 rounded-sm">
                   <div className="text-xs text-[#787b86] mb-1">Trading</div>
                   <div className="text-xs text-[#787b86]">Volume</div>
                   <div className="text-sm font-bold text-[#00bfa5]">High</div>
@@ -490,7 +490,7 @@ const MyResearchesView: React.FC<MyResearchesViewProps> = ({ initialSymbol }) =>
             {/* Bottom layout (AI Insights + Radar + Top stories) */}
             <div className="grid grid-cols-12 gap-4">
               {/* AI Insights */}
-              <div className="col-span-12 xl:col-span-7 bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] rounded-sm p-4">
+              <div className="col-span-12 xl:col-span-7 bg-white dark:bg-[#1e222d] rounded-sm p-4">
                 <h3 className="text-sm font-bold text-[#131722] dark:text-[#d1d4dc] mb-3">AI Insights</h3>
                 <div className="space-y-2">
                   {aiInsights.map((insight, i) => (
@@ -506,14 +506,14 @@ const MyResearchesView: React.FC<MyResearchesViewProps> = ({ initialSymbol }) =>
                 <button className="text-xs text-[#2962ff] mt-3 hover:underline">See more ∨</button>
               </div>
 
-              <div className="col-span-12 md:col-span-6 xl:col-span-3 bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] rounded-sm p-4">
+              <div className="col-span-12 md:col-span-6 xl:col-span-3 bg-white dark:bg-[#1e222d] rounded-sm p-4">
                 <div className="w-full h-56">
                   <RadarChart metrics={radarMetrics} />
                 </div>
               </div>
 
               {/* Top stories */}
-              <div className="col-span-12 md:col-span-6 xl:col-span-2 bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] rounded-sm p-4">
+              <div className="col-span-12 md:col-span-6 xl:col-span-2 bg-white dark:bg-[#1e222d] rounded-sm p-4">
                 <h3 className="text-sm font-bold text-[#131722] dark:text-[#d1d4dc] mb-3">Top stories</h3>
                 <div className="space-y-3">
                   {topStories.map((story) => (
@@ -555,7 +555,7 @@ const MyResearchesView: React.FC<MyResearchesViewProps> = ({ initialSymbol }) =>
 
       default:
         return (
-          <div className="bg-white dark:bg-[#1e222d] rounded-xl border border-[#e0e3eb] dark:border-[#2a2e39] p-8 min-h-[300px] flex items-center justify-center">
+          <div className="bg-white dark:bg-[#1e222d] rounded-xl p-8 min-h-[300px] flex items-center justify-center">
             <div className="text-center">
               <Icons.FileText className="w-12 h-12 text-[#787b86] mx-auto mb-4" />
               <h3 className="text-lg font-semibold text-[#131722] dark:text-[#d1d4dc] mb-2">
@@ -591,14 +591,14 @@ const MyResearchesView: React.FC<MyResearchesViewProps> = ({ initialSymbol }) =>
               <input
                 type="text"
                 placeholder="Input search text"
-                className="w-full bg-white dark:bg-[#1e222d] border border-[#e0e3eb] dark:border-[#2a2e39] rounded-md pl-10 pr-4 py-2 text-sm text-[#131722] dark:text-[#d1d4dc] placeholder-[#787b86] focus:outline-none focus:border-[#2962ff]"
+                className="w-full bg-white dark:bg-[#1e222d] rounded-md pl-10 pr-4 py-2 text-sm text-[#131722] dark:text-[#d1d4dc] placeholder-[#787b86] focus:outline-none focus:border-[#2962ff]"
               />
             </div>
           </div>
         </div>
 
         {/* Table */}
-        <div className="bg-white dark:bg-[#1e222d] rounded-xl border border-[#e0e3eb] dark:border-[#2a2e39] overflow-hidden">
+        <div className="bg-white dark:bg-[#1e222d] rounded-xl overflow-hidden">
           <table className="w-full">
             <thead>
               <tr className="border-b border-[#e0e3eb] dark:border-[#2a2e39]">

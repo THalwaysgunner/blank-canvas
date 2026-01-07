@@ -56,7 +56,7 @@ const MarketDetailView: React.FC<MarketDetailViewProps> = ({ symbol, onBack, onR
                     { label: 'Fully Diluted Market Cap', val: '$ 112,893.00', trend: '70.5%' },
                     { label: 'Circulating Supply', val: '$ 112,893.00', trend: '70.5%' },
                 ].map((stat, i) => (
-                    <div key={i} className="bg-white dark:bg-[#1e222d] p-6 rounded-xl border border-[#e0e3eb] dark:border-[#2a2e39] shadow-sm">
+                    <div key={i} className="bg-white dark:bg-[#1e222d] p-6 rounded-xl shadow-sm">
                         <div className="text-xs text-[#787b86] mb-2">{stat.label}</div>
                         <div className="text-xl font-bold text-[#131722] dark:text-[#d1d4dc] mb-1">{stat.val}</div>
                         <div className="text-xs font-bold text-[#00bfa5]">trend title ▲ {stat.trend}</div>
@@ -65,7 +65,7 @@ const MarketDetailView: React.FC<MarketDetailViewProps> = ({ symbol, onBack, onR
             </div>
 
             {/* Chart Section */}
-            <div className="bg-white dark:bg-[#1e222d] p-8 rounded-3xl shadow-sm border border-[#e0e3eb] dark:border-[#2a2e39]">
+            <div className="bg-white dark:bg-[#1e222d] p-8 rounded-3xl shadow-sm">
                 <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center gap-4">
                         <h2 className="text-xl font-bold text-[#787b86]">Chart</h2>
